@@ -1,0 +1,408 @@
+/* ==================================================
+   RESET
+================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+/* ==================================================
+   BODY
+================================================== */
+
+body{
+
+    font-family:Arial, Helvetica, sans-serif;
+    color:#fff;
+
+    background:
+        linear-gradient(
+            rgba(0,0,0,.45),
+            rgba(0,0,0,.45)
+        ),
+        url("../ASSETS/Imagens/fundo.jpg");
+
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+
+}
+
+/* ==================================================
+   SIDEBAR
+================================================== */
+
+.sidebar{
+
+    position:fixed;
+
+    top:50%;
+    left:30px;
+
+    transform:translateY(-50%);
+
+    width:100px;
+    height:600px;
+
+    padding:25px 0;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    align-items:center;
+
+    border-radius:60px;
+
+    background:rgba(255,255,255,.12);
+
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+
+    border:1px solid rgba(255,255,255,.18);
+
+    box-shadow:0 20px 50px rgba(0,0,0,.35);
+
+}
+
+.sidebar ul{
+
+    list-style:none;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    gap:30px;
+
+}
+
+.sidebar li{
+
+    width:100%;
+
+    display:flex;
+    justify-content:center;
+
+}
+
+.sidebar a{
+
+    width:58px;
+    height:58px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    text-decoration:none;
+
+    color:#fff;
+
+    border-radius:50%;
+
+    transition:.3s ease;
+
+}
+
+.sidebar a:hover i{
+
+    transform:scale(1.2);
+
+}
+
+.sidebar .active a{
+
+    background:#55c26a;
+
+    color:#fff;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+}
+
+.sidebar i{
+
+    font-size:24px;
+
+    transition:.3s;
+
+}
+
+/* ==================================================
+   CONTAINER
+================================================== */
+
+.container{
+
+    width:min(1100px,90%);
+
+    margin:50px auto 50px 180px;
+
+    padding:60px;
+
+    border-radius:35px;
+
+    background:rgba(255,255,255,.08);
+
+    backdrop-filter:blur(25px);
+    -webkit-backdrop-filter:blur(25px);
+
+    border:1px solid rgba(255,255,255,.18);
+
+    box-shadow:0 25px 70px rgba(0,0,0,.35);
+
+}
+
+/* ==================================================
+   HERO
+================================================== */
+
+.hero{
+
+    min-height:80vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+
+}
+
+.hero-content{
+
+    max-width:650px;
+
+}
+
+.hero h1{
+
+    font-size:3.5rem;
+
+    line-height:1.1;
+
+    margin-bottom:30px;
+
+}
+
+.hero p{
+
+    font-size:1.2rem;
+
+    line-height:1.8;
+
+    color:rgba(255,255,255,.9);
+
+    margin-bottom:40px;
+
+}
+
+/* ==================================================
+   BOTÕES
+================================================== */
+
+.hero-buttons{
+
+    display:flex;
+    justify-content:center;
+    gap:20px;
+
+}
+
+.btn-primary,
+.btn-secondary{
+
+    padding:15px 35px;
+
+    border-radius:50px;
+
+    text-decoration:none;
+
+    font-weight:bold;
+
+    transition:.3s ease;
+
+}
+
+.btn-primary{
+
+    background:#55c26a;
+
+    color:#fff;
+
+}
+
+.btn-primary:hover{
+
+    background:#43a857;
+
+    transform:translateY(-3px);
+
+}
+
+.btn-secondary{
+
+    border:2px solid rgba(255,255,255,.8);
+
+    color:#fff;
+
+}
+
+.btn-secondary:hover{
+
+    background:rgba(255,255,255,.15);
+
+    transform:translateY(-3px);
+
+}
+
+/* ==================================================
+   FUNCIONALIDADES
+================================================== */
+
+.features{
+
+    margin-top:100px;
+
+    text-align:center;
+
+}
+
+.features h2{
+
+    font-size:2.3rem;
+
+    margin-bottom:40px;
+
+}
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+
+    gap:30px;
+
+}
+
+.card{
+
+    padding:30px;
+
+    border-radius:25px;
+
+    background:rgba(255,255,255,.08);
+
+    backdrop-filter:blur(15px);
+
+    border:1px solid rgba(255,255,255,.15);
+
+    transition:.3s ease;
+
+}
+
+.card:hover{
+
+    transform:translateY(-10px);
+
+    background:rgba(255,255,255,.15);
+
+}
+
+.card h3{
+
+    margin:20px 0 10px;
+
+}
+
+.card p{
+
+    line-height:1.7;
+
+    color:rgba(255,255,255,.85);
+
+}
+
+/* ==================================================
+   SOBRE
+================================================== */
+
+.about{
+
+    margin-top:100px;
+
+    text-align:center;
+
+}
+
+.about h2{
+
+    font-size:2.3rem;
+
+    margin-bottom:30px;
+
+}
+
+.about p{
+
+    max-width:800px;
+
+    margin:auto;
+
+    line-height:1.8;
+
+    color:rgba(255,255,255,.9);
+
+}
+
+/* ==================================================
+   CTA
+================================================== */
+
+.cta{
+
+    margin-top:100px;
+
+    text-align:center;
+
+}
+
+.cta h2{
+
+    font-size:2.3rem;
+
+    margin-bottom:20px;
+
+}
+
+.cta p{
+
+    margin-bottom:35px;
+
+    color:rgba(255,255,255,.9);
+
+}
+
+/* ==================================================
+   FOOTER
+================================================== */
+
+footer{
+
+    text-align:center;
+
+    margin-top:100px;
+
+    padding:30px;
+
+    color:rgba(255,255,255,.7);
+
+}
