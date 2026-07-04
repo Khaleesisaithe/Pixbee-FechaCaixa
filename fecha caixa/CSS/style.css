@@ -7,6 +7,8 @@
     box-sizing: border-box; 
 }
 
+<link rel="stylesheet" href="CSS/style.css">
+
 html{
     scroll-behavior: smooth;
 }
@@ -387,4 +389,120 @@ body{
 
 .main-footer p {
     font-size: 0.85rem;
+}
+
+/* ==================================================
+   PAGINA DE CONTAGEM (SISTEMA)
+================================================== */
+
+.btn-iniciar {
+    width: 100%;             /* Faz o botão preencher toda a largura disponível do formulário */
+    display: flex;
+    justify-content: center; /* Centraliza o texto e o ícone internamente */
+    align-items: center;
+    gap: 10px;               /* Dá um espaço de 10px entre o texto e a setinha */
+    
+    padding: 16px;           /* Altura confortável para o clique */
+    font-size: 1.1rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    
+    border: none;
+    cursor: pointer;
+    
+    /* Copia o verde padrão que você já usa no seu sistema */
+    background: #55c26a; 
+    color: #fff;
+    border-radius: 50px;     /* Formato pílula combinando com os botões do Hero */
+    
+    /* Transição suave para o efeito de passar o mouse */
+    transition: all 0.3s ease; 
+    
+    /* Sombra verde sutil para dar efeito de profundidade (Glow) */
+    box-shadow: 0 10px 20px rgba(85, 194, 106, 0.2); 
+}
+
+/* Efeito ao passar o mouse */
+.btn-iniciar:hover {
+    background: #43a857;     /* Escurece o verde levemente */
+    transform: translateY(-2px); /* Faz o botão dar um leve "salto" para cima */
+    box-shadow: 0 12px 25px rgba(85, 194, 106, 0.35); /* Clarea e aumenta a sombra */
+}
+
+/* Efeito ao clicar no botão */
+.btn-iniciar:active {
+    transform: translateY(0); /* O botão volta para a posição normal simulando o clique físico */
+}
+
+/* Container das opções */
+.opcoes-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+    margin-bottom: 30px; /* Dá espaço para o botão embaixo */
+}
+
+/* O card que funciona como label */
+.card-opcao {
+    cursor: pointer;
+    display: block;
+    width: 100%;
+}
+
+/* Esconde o círculo padrão do input radio */
+.card-opcao input[type="radio"] {
+    display: none;
+}
+
+/* Estrutura visual do Card (Efeito Vidro) */
+.card-conteudo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Efeito de Hover comum */
+.card-opcao:hover .card-conteudo {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* --- O SEGREDO DO CARD SELECIONADO --- */
+/* Quando o radio escondido for checado, muda a cor do card inteiro */
+.card-opcao input[type="radio"]:checked + .card-conteudo {
+    background: rgba(0, 173, 181, 0.15); /* Cor tema com transparência */
+    border-color: #00adb5; /* Borda acesa com a cor da logo */
+    box-shadow: 0 0 15px rgba(0, 173, 181, 0.2);
+}
+
+/* Organização interna do texto do card */
+.emoji { font-size: 1.8rem; }
+.info-opcao h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+.info-opcao p { font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); }
+
+/* ==================================================
+   ESTILIZAÇÃO DO BOTÃO INICIAR
+================================================== */
+.btn-iniciar {
+    width: 100%; /* Ocupa a largura total do formulário */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Espaço entre o texto e a setinha */
+    padding: 16px;
+    font-size: 1.1rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(85, 194, 106, 0.2);
+}
+
+.btn-iniciar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(85, 194, 106, 0.3);
 }

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contagem PixBee</title>
+    
+    <link rel="stylesheet" href="../CSS/style.css">
+    <!-- CORRIGIDO: O link do FontAwesome estava cortado pela metade e quebrava os ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <div class="logo">
+            <a href="index.html">PIX<span>Bee</span></a>
+        </div>
+
+        <nav>
+            <ul>
+                <li class="active">
+                    <a href="index.html" title="Início">
+                        <i class="fa-solid fa-house"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="SISTEMA/DadosContador.html" title="Contagem">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" title="Histórico">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" title="Configurações">
+                        <i class="fa-solid fa-gear"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="sobre.html" title="Sobre">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- ================= DASHBOARD PRINCIPAL ================= -->
+    <!-- ORGANIZADO: Todo o conteúdo agora fica dentro do grid que criamos -->
+    <main class="dashboard-content">
+
+        <!-- CONTAINER 1 (ESQUERDA): FORMULÁRIO DE DADOS -->
+        <div class="container container-hero">
+            <form class="caixa-formulario">
+                <h2>Informações do Caixa</h2>
+                
+                <div class="campo-grupo">
+                    <label for="operador">Operador do Caixa</label>
+                    <input type="text" id="operador" placeholder="Digite seu nome">
+                </div>
+
+                <div class="campo-grupo">
+                    <label for="valor-inicial">Valor de Fundo / Abertura (R$)</label>
+                    <input type="number" id="valor-inicial" step="0.01" placeholder="0,00">
+                </div>
+
+                <div class="campo-grupo">
+                    <label for="nome-empresa">Nome da Empresa</label>
+                    <input type="text" id="nome-empresa" placeholder="Digite o nome da empresa">
+                </div>
+
+                <div class="campo-grupo">
+                    <label for="observacoes">Observações</label>
+                    <textarea id="observacoes" placeholder="Digite observações adicionais"></textarea>
+                </div> 
+            </form>
+        </div>
+
+        <!-- CONTAINER 2 (DIREITA SUPERIOR): MODALIDADE DE SELEÇÃO -->
+        <!-- CORRIGIDO: Estava com duas divs abertas com o mesmo nome e sem fechamento -->
+        <div class="container container-sobre">
+            <div class="caixa-formulario">
+                <h2>🏦 Novo Fechamento</h2>
+                <p class="subtitulo-form">Preencha os dados e escolha a modalidade ideal</p>
+                
+                <div class="secao-selecao">
+                    <label class="titulo-grupo">Modalidade de Contagem</label>
+                    
+                    <div class="opcoes-grid">
+                        <!-- Opção Cédulas (Com rádio nativo e interativo) -->
+                        <label class="card-opcao">
+                            <input type="radio" name="tipo_contagem" value="cedulas" checked>
+                            <div class="card-conteudo">
+                                <span class="emoji">💵</span>
+                                <div class="info-opcao">
+                                    <h4>Apenas Cédulas</h4>
+                                    <p>R$ 2 · R$ 5 · R$ 10 · R$ 20 · R$ 50 · R$ 100 · R$ 200</p>
+                                </div>
+                            </div>
+                        </label>
+
+                        <!-- Opção Moedas -->
+                        <label class="card-opcao">
+                            <input type="radio" name="tipo_contagem" value="moedas">
+                            <div class="card-conteudo">
+                                <span class="emoji">🪙</span>
+                                <div class="info-opcao">
+                                    <h4>Apenas Moedas</h4>
+                                    <p>R$ 0,01 · R$ 0,05 · R$ 0,10 · R$ 0,25 · R$ 0,50 · R$ 1,00</p>
+                                </div>
+                            </div>
+                        </label>
+
+                        <!-- Opção Completa -->
+                        <label class="card-opcao">
+                            <input type="radio" name="tipo_contagem" value="completa">
+                            <div class="card-conteudo">
+                                <span class="emoji">💰</span>
+                                <div class="info-opcao">
+                                    <h4>Cédulas + Moedas</h4>
+                                    <p>Contagem completa de notas e moedas do caixa</p>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <p class="nota-privacidade">
+                    🔒 <strong>Privacidade total:</strong> nenhuma informação digitada aqui é enviada ou armazenada em servidores. Tudo funciona localmente no seu dispositivo.
+                </p>
+            </div>
+        </div>
+
+        <!-- CONTAINER 3 (DIREITA INFERIOR): BOTÃO DE AÇÃO -->
+        <div class="container container-funcionalidades" style="display: flex; align-items: center; justify-content: center;">
+            <button type="submit" class="btn-primary btn-iniciar">
+                Iniciar Contagem <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- ================= FOOTER (FORA DOS CONTAINERS) ================= -->
+    <footer class="main-footer">
+        <div class="footer-logo">
+            <h3>PixBee - Fecha Caixa</h3>
+        </div>
+        <div class="footer-links">
+            <a href="#">GitHub</a>
+            <a href="#">Documentação</a>
+            <a href="contato.html">Contato</a>
+        </div>
+        <p>© 2026 PixBee • Projeto Acadêmico da @KhaleesiSaithen</p>
+    </footer>
+
+    <!-- Scripts carregados corretamente no final -->
+    <script src="JS/script.js"></script>
+
+</body>
+</html>
