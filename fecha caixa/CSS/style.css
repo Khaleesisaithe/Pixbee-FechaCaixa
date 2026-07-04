@@ -1,408 +1,390 @@
 /* ==================================================
    RESET
 ================================================== */
-
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; 
 }
 
 html{
-    scroll-behavior:smooth;
+    scroll-behavior: smooth;
 }
 
 /* ==================================================
-   BODY
+   BODY (Fundo e comportamento da página)
 ================================================== */
-
 body{
-
-    font-family:Arial, Helvetica, sans-serif;
-    color:#fff;
-
+    font-family: Arial, Helvetica, sans-serif;
+    color: #fff;
     background:
-        linear-gradient(
-            rgba(0,0,0,.45),
-            rgba(0,0,0,.45)
-        ),
+        linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)),
         url("../ASSETS/Imagens/fundo.jpg");
-
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
-    background-attachment:fixed;
-
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    
+    /* Permite a rolagem normal da página agora que temos 3 blocos grandes */
+    overflow-x: hidden;
+    overflow-y: auto; 
 }
 
+/* Importação da fonte para a Logo */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght=400;700&display=swap');
+
 /* ==================================================
-   SIDEBAR
+   SIDEBAR (Fixa na lateral esquerda)
 ================================================== */
-
 .sidebar{
+    position: fixed;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    width: 120px; 
+    height: 600px;
+    padding: 25px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 40px;
 
-    position:fixed;
-
-    top:50%;
-    left:30px;
-
-    transform:translateY(-50%);
-
-    width:100px;
-    height:600px;
-
-    padding:25px 0;
-
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    align-items:center;
-
-    border-radius:60px;
-
-    background:rgba(255,255,255,.12);
-
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
-
-    border:1px solid rgba(255,255,255,.18);
-
-    box-shadow:0 20px 50px rgba(0,0,0,.35);
-
+    /* Estética de vidro */
+    background: rgba(255,255,255,.12);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,.18);
+    box-shadow: 0 20px 50px rgba(0,0,0,.35);
+    z-index: 10; /* Garante que ela fique sempre por cima de tudo */
 }
 
 .sidebar ul{
-
-    list-style:none;
-
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-
-    gap:30px;
-
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px; 
 }
 
-.sidebar li{
+/* Estilização da nova logo vertical (Fecha em cima, Caixa embaixo) */
+.sidebar .logo {
+    padding: 10px;
+    text-align: center;
+}
 
-    width:100%;
+.sidebar .logo a {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;         
+    font-weight: 700;         
+    color: #ffffff;           
+    text-decoration: none;    
+    letter-spacing: -0.5px;   
+    display: flex;
+    flex-direction: column;  
+    align-items: center;     
+    line-height: 1.1;        
+    transition: opacity 0.2s;
+}
 
-    display:flex;
-    justify-content:center;
+.sidebar .logo a span {
+    font-weight: 400;         
+    color: #00adb5;           
+}
 
+.sidebar .logo a:hover {
+    opacity: 0.9;
 }
 
 .sidebar a{
-
-    width:58px;
-    height:58px;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    text-decoration:none;
-
-    color:#fff;
-
-    border-radius:50%;
-
-    transition:.3s ease;
-
+    width: 58px;
+    height: 58px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: #fff;
+    border-radius: 50%; 
+    transition: .3s ease; 
 }
 
 .sidebar a:hover i{
-
-    transform:scale(1.2);
-
+    transform: scale(1.2);
 }
 
 .sidebar .active a{
-
-    background:#55c26a;
-
-    color:#fff;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.25);
-
+    background: #55c26a; 
+    color: #fff;
+    box-shadow: 0 10px 25px rgba(0,0,0,.25); 
 }
 
 .sidebar i{
-
-    font-size:24px;
-
-    transition:.3s;
-
+    font-size: 24px;
+    transition: .3s;
 }
 
 /* ==================================================
-   CONTAINER
+   DASHBOARD CONTENT (O fluxo dos containers)
 ================================================== */
-
-.container{
-
-    width:min(1100px,90%);
-
-    margin:50px auto 50px 180px;
-
-    padding:60px;
-
-    border-radius:35px;
-
-    background:rgba(255,255,255,.08);
-
-    backdrop-filter:blur(25px);
-    -webkit-backdrop-filter:blur(25px);
-
-    border:1px solid rgba(255,255,255,.18);
-
-    box-shadow:0 25px 70px rgba(0,0,0,.35);
-
+.dashboard-content {
+    /* Empurra todo o fluxo para a direita para não ficar embaixo da sidebar */
+    margin-left: 160px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px;
+    gap: 50px; /* Distância perfeita e idêntica entre os 3 containers de vidro */
 }
 
 /* ==================================================
-   HERO
+   DASHBOARD CONTENT (Transformado em Grade/Grid)
 ================================================== */
+.dashboard-content {
+    /* Desconta o espaço da sidebar na esquerda */
+    margin-left: 140px; 
+    padding: 30px;
+    box-sizing: border-box;
+    
+    /* Trava a altura na tela do usuário para virar um painel fixo */
+    width: calc(100vw - 140px);
+    height: calc(100vh - 120px); /* Deixa uma sobra embaixo para o footer externo */
 
-.hero{
-
-    min-height:80vh;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    text-align:center;
-
-}
-
-.hero-content{
-
-    max-width:650px;
-
-}
-
-.hero h1{
-
-    font-size:3.5rem;
-
-    line-height:1.1;
-
-    margin-bottom:30px;
-
-}
-
-.hero p{
-
-    font-size:1.2rem;
-
-    line-height:1.8;
-
-    color:rgba(255,255,255,.9);
-
-    margin-bottom:40px;
-
+    /* --- O SEGREDO DO LAYOUT ESTÁ AQUI --- */
+    display: grid;
+    /* Divide o espaço em duas colunas: a da esquerda fica maior (1.20) e a da direita menor (1fr) */
+    grid-template-columns: 1.25fr 1fr;
+    /* Divide o espaço da direita em duas linhas de tamanhos iguais (50% cada) */
+    grid-template-rows: 1fr 1fr;
+    gap: 25px; /* Espaçamento idêntico entre os 3 containers */
 }
 
 /* ==================================================
-   BOTÕES
+   POSICIONAMENTO DE CADA CONTAINER NA GRADE
 ================================================== */
 
+/* Container 1 (Hero): Fica na esquerda e ocupa as duas linhas (de cima até embaixo) */
+.container-hero {
+    grid-column: 1;
+    grid-row: 1 / span 2; 
+    
+    /* Centraliza o conteúdo do Hero verticalmente dentro dele */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Container 2 (Sobre): Fica na coluna da direita, na linha 1 (Cima) */
+.container-sobre {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+/* Container 3 (Funcionalidades): Fica na coluna da direita, na linha 2 (Baixo) */
+.container-funcionalidades {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+/* ==================================================
+   DASHBOARD CONTENT (Controla o tamanho das colunas)
+================================================== */
+.dashboard-content {
+    margin-left: 140px; 
+    padding: 30px;
+    box-sizing: border-box;
+    
+    width: calc(100vw - 140px);
+    height: calc(100vh - 120px); 
+
+    display: grid;
+    /* Container 1 (esquerda) menor com 0.8fr, lado direito maior com 1.2fr */
+    grid-template-columns: 0.8fr 1.2fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 25px; 
+}
+
+/* ==================================================
+   ESTILO PADRÃO DOS CONTAINERS (COM O GLASSMORPHISM VIVO)
+================================================== */
+.container {
+    width: 100%;
+    height: 100%; 
+    padding: 30px; 
+    border-radius: 25px;
+    box-sizing: border-box;
+    overflow-y: auto; 
+
+    /* --- O EFEITO DE VIDRO GARANTIDO AQUI --- */
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* ==================================================
+   MINI CORREÇÕES DE ESPAÇAMENTO INTERNO
+================================================== */
+.features {
+    margin-bottom: 0; /* Remove aquele espaçamento antigo */
+}
+
+/* Deixa os cartões menores e em linha única ou duas para caber no container da direita */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.card {
+    padding: 15px; /* Mais compacto para o painel menor */
+}
+
+.cta {
+    display: none; /* Dica: o CTA pode ser ocultado ou integrado ao Hero, pois não haverá espaço físico na caixinha da direita para ele junto com as funcionalidades */
+}
+/* ==================================================
+   CONTEÚDO INTERNO DOS CONTAINERS (Textos e Alinhamentos)
+================================================== */
+
+/* Container 1: Hero */
+.hero {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.hero-content { max-width: 700px; }
+.hero h1 {
+    font-size: 3rem;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+.hero p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: rgba(255,255,255,.85);
+    margin-bottom: 30px;
+}
 .hero-buttons{
-
-    display:flex;
-    justify-content:center;
-    gap:20px;
-
+    display: flex;
+    justify-content: center;
+    gap: 20px;
 }
 
-.btn-primary,
-.btn-secondary{
-
-    padding:15px 35px;
-
-    border-radius:50px;
-
-    text-decoration:none;
-
-    font-weight:bold;
-
-    transition:.3s ease;
-
+/* Botões */
+.btn-primary, .btn-secondary {
+    padding: 15px 35px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: .3s ease;
 }
+.btn-primary { background: #55c26a; color: #fff; }
+.btn-primary:hover { background: #43a857; transform: translateY(-3px); }
+.btn-secondary { border: 2px solid rgba(255,255,255,.8); color: #fff; }
+.btn-secondary:hover { background: rgba(255,255,255,.15); transform: translateY(-3px); }
 
-.btn-primary{
-
-    background:#55c26a;
-
-    color:#fff;
-
+/* Container 2: Sobre */
+.about {
+    text-align: center;
 }
-
-.btn-primary:hover{
-
-    background:#43a857;
-
-    transform:translateY(-3px);
-
+.about h2 {
+    font-size: 2.2rem;
+    margin-bottom: 25px;
 }
-
-.btn-secondary{
-
-    border:2px solid rgba(255,255,255,.8);
-
-    color:#fff;
-
+.about p {
+    max-width: 850px;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin: 0 auto 20px auto;
+    color: rgba(255,255,255,.9);
 }
+.about p:last-child { margin-bottom: 0; }
 
-.btn-secondary:hover{
-
-    background:rgba(255,255,255,.15);
-
-    transform:translateY(-3px);
-
+/* Container 3: Funcionalidades e CTA */
+.features {
+    text-align: center;
+    margin-bottom: 60px; /* Separa as funcionalidades da seção CTA embaixo */
 }
+.features h2 {
+    font-size: 2.2rem;
+    margin-bottom: 35px;
+}
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+.card {
+    padding: 30px;
+    border-radius: 20px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    transition: .3s ease;
+}
+.card:hover {
+    transform: translateY(-5px);
+    background: rgba(255,255,255,.12);
+}
+.card i { color: #00adb5; margin-bottom: 15px; }
+.card h3 { margin: 15px 0 10px; font-size: 1.3rem; }
+.card p { line-height: 1.6; color: rgba(255,255,255,.8); font-size: 0.95rem; }
+
+/* CTA dentro do container 3 */
+.cta {
+    text-align: center;
+    padding: 20px 0;
+    border-top: 1px solid rgba(255,255,255,.1); /* Linha sutil para separar as seções */
+    padding-top: 40px;
+}
+.cta h2 { font-size: 2rem; margin-bottom: 15px; }
+.cta p { margin-bottom: 25px; color: rgba(255,255,255,.85); }
 
 /* ==================================================
-   FUNCIONALIDADES
+   MAIN FOOTER (Totalmente externo no final da página)
 ================================================== */
-
-.features{
-
-    margin-top:100px;
-
-    text-align:center;
-
+.main-footer {
+    /* Ocupa a largura total da tela menos o espaço ocupado pela sidebar */
+    width: calc(100vw - 120px); 
+    
+    /* Afasta o rodapé da sidebar e centraliza o bloco no espaço restante */
+    margin-left: 120px; 
+    margin-right: auto;
+    
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.6);
+    box-sizing: border-box; /* Garante que os paddings não estoure a largura da tela */
 }
 
-.features h2{
-
-    font-size:2.3rem;
-
-    margin-bottom:40px;
-
+.main-footer .footer-logo h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 15px;
 }
 
-.cards{
-
-    display:grid;
-
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-
-    gap:30px;
-
+.main-footer .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin-bottom: 20px;
 }
 
-.card{
-
-    padding:30px;
-
-    border-radius:25px;
-
-    background:rgba(255,255,255,.08);
-
-    backdrop-filter:blur(15px);
-
-    border:1px solid rgba(255,255,255,.15);
-
-    transition:.3s ease;
-
+.main-footer .footer-links a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s;
 }
 
-.card:hover{
-
-    transform:translateY(-10px);
-
-    background:rgba(255,255,255,.15);
-
+.main-footer .footer-links a:hover {
+    color: #00adb5; /* Acende com a cor tema ao passar o mouse */
 }
 
-.card h3{
-
-    margin:20px 0 10px;
-
-}
-
-.card p{
-
-    line-height:1.7;
-
-    color:rgba(255,255,255,.85);
-
-}
-
-/* ==================================================
-   SOBRE
-================================================== */
-
-.about{
-
-    margin-top:100px;
-
-    text-align:center;
-
-}
-
-.about h2{
-
-    font-size:2.3rem;
-
-    margin-bottom:30px;
-
-}
-
-.about p{
-
-    max-width:800px;
-
-    margin:auto;
-
-    line-height:1.8;
-
-    color:rgba(255,255,255,.9);
-
-}
-
-/* ==================================================
-   CTA
-================================================== */
-
-.cta{
-
-    margin-top:100px;
-
-    text-align:center;
-
-}
-
-.cta h2{
-
-    font-size:2.3rem;
-
-    margin-bottom:20px;
-
-}
-
-.cta p{
-
-    margin-bottom:35px;
-
-    color:rgba(255,255,255,.9);
-
-}
-
-/* ==================================================
-   FOOTER
-================================================== */
-
-footer{
-
-    text-align:center;
-
-    margin-top:100px;
-
-    padding:30px;
-
-    color:rgba(255,255,255,.7);
-
+.main-footer p {
+    font-size: 0.85rem;
 }

@@ -2,230 +2,134 @@
 <html lang="pt-BR">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>FechaCaixa | Início</title>
+    <title>PixBee FechaCaixa</title>
 
     <link rel="stylesheet" href="CSS/style.css">
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 
 <body>
 
     <!-- ================= SIDEBAR ================= -->
-
     <aside class="sidebar">
-
         <div class="logo">
-
-            <img src="ASSETS/Logo/logo.png" alt="Logo FechaCaixa">
-
+            <a href="index.html">PIX<span>Bee</span></a>
         </div>
 
         <nav>
-
             <ul>
-
                 <li class="active">
                     <a href="index.html" title="Início">
                         <i class="fa-solid fa-house"></i>
                     </a>
                 </li>
-
                 <li>
                     <a href="SISTEMA/SeleçãodeContagem.html" title="Contagem">
                         <i class="fa-solid fa-money-bill-wave"></i>
                     </a>
                 </li>
-
                 <li>
                     <a href="#" title="Histórico">
                         <i class="fa-solid fa-clipboard-list"></i>
                     </a>
                 </li>
-
                 <li>
                     <a href="#" title="Configurações">
                         <i class="fa-solid fa-gear"></i>
                     </a>
                 </li>
-
                 <li>
                     <a href="sobre.html" title="Sobre">
                         <i class="fa-solid fa-circle-info"></i>
                     </a>
                 </li>
-
             </ul>
-
         </nav>
-
     </aside>
 
-    <!-- ================= CONTAINER ================= -->
+    <!-- ================= CONTEÚDO PRINCIPAL (DASHBOARD WRAPPER) ================= -->
+    <main class="dashboard-content">
 
-    <div class="container">
-
-        <main>
-
-            <!-- HERO -->
-
+        <!-- CONTAINER 1: BOAS-VINDAS / HERO -->
+        <div class="container container-hero">
             <section class="hero">
-
                 <div class="hero-content">
-
-                    <h1>Simplifique o fechamento do seu caixa.</h1>
-
+                    <h1>Simplifique e proteja o fechamento do seu caixa</h1>
                     <p>
-                        O FechaCaixa foi desenvolvido para agilizar a conferência
-                        de valores em dinheiro, reduzindo erros e tornando o
-                        fechamento diário mais rápido, organizado e confiável.
+                        Desenvolvido para otimizar a gestão financeira do varejo, o FechaCaixa agiliza a conferência de cédulas e moedas, reduzindo divergências de valores e garantindo total precisão no seu balanço diário.
                     </p>
-
                     <div class="hero-buttons">
-
-                        <a href="SISTEMA/SeleçãodeContagem.html" class="btn-primary">
-                            Iniciar Contagem
-                        </a>
-
-                        <a href="#sobre" class="btn-secondary">
-                            Saiba Mais
-                        </a>
-
+                        <a href="SISTEMA/SeleçãodeContagem.html" class="btn-primary">Iniciar Contagem</a>
+                        <a href="#sobre" class="btn-secondary">Saiba Mais</a>
                     </div>
-
                 </div>
-
             </section>
+        </div>
 
-            <!-- FUNCIONALIDADES -->
-
-            <section class="features">
-
-                <h2>Funcionalidades</h2>
-
-                <div class="cards">
-
-                    <article class="card">
-
-                        <i class="fa-solid fa-calculator fa-2x"></i>
-
-                        <h3>Contagem Inteligente</h3>
-
-                        <p>
-                            Calcule automaticamente o valor total de notas e moedas
-                            com rapidez e precisão.
-                        </p>
-
-                    </article>
-
-                    <article class="card">
-
-                        <i class="fa-solid fa-cash-register fa-2x"></i>
-
-                        <h3>Fechamento Completo</h3>
-
-                        <p>
-                            Registre e acompanhe todos os fechamentos de caixa
-                            de forma simples e organizada.
-                        </p>
-
-                    </article>
-
-                    <article class="card">
-
-                        <i class="fa-solid fa-chart-line fa-2x"></i>
-
-                        <h3>Produtividade</h3>
-
-                        <p>
-                            Otimize o processo de fechamento e reduza o tempo
-                            gasto nas conferências diárias.
-                        </p>
-
-                    </article>
-
-                </div>
-
-            </section>
-
-            <!-- SOBRE -->
-
+        <!-- CONTAINER 2: SOBRE O PROJETO -->
+        <div class="container container-sobre">
             <section class="about" id="sobre">
-
-                <h2>Sobre o Projeto</h2>
-
+                <h2>Sobre o PixBee Fecha Caixa</h2>
                 <p>
-
-                    O <strong>FechaCaixa</strong> nasceu da união entre a
-                    universidade e a experiência prática adquirida no trabalho
-                    com operações de caixa.
-
-                    O projeto tem como objetivo desenvolver soluções inteligentes
-                    que automatizem cálculos, reduzam erros e tornem o fechamento
-                    de caixa mais rápido, seguro e eficiente para profissionais
-                    do varejo.
-
+                    O PixBee Fecha Caixa é uma ferramenta inovadora que visa facilitar o processo de fechamento de caixa em estabelecimentos comerciais. Com uma interface intuitiva e recursos avançados, ele permite que os usuários realizem a contagem de valores em dinheiro de forma rápida e precisa.
+                    O projeto nasceu da união entre a universidade e a experiência prática adquirida no trabalho com operações de caixa, com o objetivo de desenvolver soluções inteligentes que automatizem cálculos, reduzam erros e tornem a rotina mais segura para profissionais do varejo.
                 </p>
+            </section>
+        </div>
 
+        <!-- CONTAINER 3: FUNCIONALIDADES E CTA -->
+        <div class="container container-funcionalidades">
+            <!-- Funcionalidades -->
+            <section class="features">
+            
+                <div class="cards">
+                    <article class="card">
+                        <i class="fa-solid fa-calculator fa-2x"></i>
+                        <h3>Contagem Inteligente</h3>
+                        <p>Calcule automaticamente o valor total de notas e moedas com rapidez e precisão.</p>
+                    </article>
+
+                    <article class="card">
+                        <i class="fa-solid fa-cash-register fa-2x"></i>
+                        <h3>Fechamento Completo</h3>
+                        <p>Registre e acompanhe todos os fechamentos de caixa de forma simples e organizada.</p>
+                    </article>
+
+                    <article class="card">
+                        <i class="fa-solid fa-chart-line fa-2x"></i>
+                        <h3>Produtividade</h3>
+                        <p>Otimize o processo de fechamento e reduza o tempo gasto nas conferências diárias.</p>
+                    </article>
+                </div>
             </section>
 
-            <!-- CTA -->
-
+            <!-- Chamada para Ação (CTA) -->
             <section class="cta">
-
                 <h2>Pronto para começar?</h2>
-
-                <p>
-                    Experimente o FechaCaixa e transforme a forma como você
-                    realiza o fechamento diário.
-                </p>
-
-                <a href="SISTEMA/SeleçãodeContagem.html" class="btn-primary">
-                    Começar Agora
-                </a>
-
+                <p>Experimente o FechaCaixa e transforme a forma como você realiza o fechamento diário.</p>
+                <a href="SISTEMA/SeleçãodeContagem.html" class="btn-primary">Começar Agora</a>
             </section>
+        </div>
 
-        </main>
+    </main>
 
-        <!-- ================= FOOTER ================= -->
+    <!-- ================= FOOTER (AGORA FORA DOS CONTAINERS) ================= -->
+    <footer class="main-footer">
+        <div class="footer-logo">
+            <h3>PixBee - Fecha Caixa</h3>
+        </div>
+        <div class="footer-links">
+            <a href="#">GitHub</a>
+            <a href="#">Documentação</a>
+            <a href="contato.html">Contato</a>
+        </div>
+        <p>© 2026 PixBee • Projeto Acadêmico da @KhaleesiSaithen</p>
+    </footer>
 
-        <footer>
-
-            <div class="footer-logo">
-
-                <h3>FechaCaixa</h3>
-
-            </div>
-
-            <div class="footer-links">
-
-                <a href="#">GitHub</a>
-
-                <a href="#">Documentação</a>
-
-                <a href="contato.html">Contato</a>
-
-            </div>
-
-            <p>
-
-                © 2026 FechaCaixa • Projeto Acadêmico.
-
-            </p>
-
-        </footer>
-
-    </div>
-
+    <!-- Scripts carregados estritamente antes do fim do body -->
     <script src="JS/script.js"></script>
 
 </body>
-
 </html>
