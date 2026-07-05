@@ -1,0 +1,21 @@
+<h3>Operador: <span id="operador"></span></h3>
+<h3>Empresa: <span id="empresa"></span></h3>
+<h3>Fundo: <span id="fundo"></span></h3>
+
+<input id="m005" type="number" placeholder="Moedas de 5 centavos">
+<input id="m010" type="number">
+<input id="m025" type="number">
+<input id="m050" type="number">
+<input id="m100" type="number">
+
+<input id="n2" type="number">
+<input id="n5" type="number">
+<input id="n10" type="number">
+<input id="n20" type="number">
+<input id="n50" type="number">
+<input id="n100" type="number">
+<input id="n200" type="number">
+
+<h1>Total: <span id="total">R$ 0,00</span></h1>
+
+<script src="contagem.js"></script>

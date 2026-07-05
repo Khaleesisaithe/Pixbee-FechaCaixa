@@ -1,0 +1,186 @@
+/* ==================================================
+   LAYOUT DO NOVO CONTAINER ÚNICO (REF: MAPA VISUAL)
+================================================== */
+
+/* Ajuste do espaço ao lado da sidebar */
+.dashboard-content {
+    margin-left: 140px; 
+    padding: 30px;
+    box-sizing: border-box;
+    width: calc(100vw - 140px);
+    height: calc(100vh - 120px); 
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+/* O Grande Container com Efeito Vidro Absoluto */
+.container-unico-glass {
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    border-radius: 25px;
+    overflow-y: auto;
+    flex-wrap: nowrap;
+    
+    /* Efeito de Vidro */
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Formulário Interno */
+.formulario-fluxo {
+    display: flex;
+    flex-direction: column;
+    gap: 80px; /* Distanciamento perfeito entre as seções verticais */
+    width: 100%;
+}
+
+/* 1. Linha do Topo (3 Caixas de inputs lado a lado) */
+.bloco-inputs-topo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.sub-caixa {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sub-caixa label, 
+.bloco-observacoes-centro label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 550;
+}
+
+.sub-caixa input, 
+.bloco-observacoes-centro input {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 40px; /* Estilo pílula arredondado igual ao desenho */
+    color: #fff;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.sub-caixa input:focus, 
+.bloco-observacoes-centro input:focus {
+    border-color: #00adb5;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* 2. Campo Central de Observações (Linha única comprida) */
+.bloco-observacoes-centro {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+/* 3. Seção do Meio/Baixo (As 3 Caixas de seleção lado a lado) */
+.secao-modalidades h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    color: #00adb5;
+    margin-bottom: 15px;
+}
+
+.opcoes-linha {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+/* Customização dos cartões radio no formato fluido */
+.card-opcao {
+    cursor: pointer;
+    display: block;
+}
+
+.card-opcao input[type="radio"] {
+    display: none;
+}
+
+.card-conteudo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px 20px;
+    border-radius: 50px; /* Mantém o formato arredondado contínuo */
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card-opcao:hover .card-conteudo {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.card-opcao input[type="radio"]:checked + .card-conteudo {
+    background: rgba(0, 173, 181, 0.15);
+    border-color: #00adb5;
+    box-shadow: 0 0 15px rgba(0, 173, 181, 0.2);
+}
+
+.info-opcao h4 { font-size: 1rem; font-weight: 700; }
+.info-opcao p { font-size: 0.8rem; color: rgba(255, 255, 255, 0.5); }
+
+/* 4. Base do painel: Botão Iniciar Centralizado */
+.bloco-botao-base {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    margin-top: 10px;
+}
+
+.bloco-botao-base .btn-iniciar {
+    max-width: 350px; /* Garante o formato compacto do botão na base */
+}
+
+.nota-privacidade {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* ==================================================
+   BOTÃO INICIAR CONTAGEM
+================================================== */
+
+.btn-iniciar{
+    width: 100%;
+    max-width: 320px;      /* Mesmo tamanho visual das caixas */
+    height: 58px;          /* Mesma altura dos inputs */
+    border: none;
+    border-radius: 50px;   /* Totalmente arredondado */
+    background: linear-gradient(135deg, #00adb5, #00d4c8);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .3s ease;
+    box-shadow: 0 10px 25px rgba(0, 173, 181, .25);
+}
+
+.btn-iniciar:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(0,173,181,.35);
+}
+
+.btn-iniciar:active{
+    transform: scale(.98);
+}
+
+

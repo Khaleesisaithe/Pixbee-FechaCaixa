@@ -1,5 +1,5 @@
 /* ==================================================
-   RESET
+   1. RESET & CONFIGURAÇÕES GLOBAIS
 ================================================== */
 *{
     margin: 0;
@@ -7,15 +7,11 @@
     box-sizing: border-box; 
 }
 
-<link rel="stylesheet" href="CSS/style.css">
-
 html{
     scroll-behavior: smooth;
+    scrollbar-gutter: stable;
 }
 
-/* ==================================================
-   BODY (Fundo e comportamento da página)
-================================================== */
 body{
     font-family: Arial, Helvetica, sans-serif;
     color: #fff;
@@ -26,17 +22,16 @@ body{
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    
-    /* Permite a rolagem normal da página agora que temos 3 blocos grandes */
     overflow-x: hidden;
     overflow-y: auto; 
 }
 
-/* Importação da fonte para a Logo */
+/* Importação da fonte para a Logo e Títulos */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght=400;700&display=swap');
 
+
 /* ==================================================
-   SIDEBAR (Fixa na lateral esquerda)
+   2. SIDEBAR (Fixa na lateral esquerda)
 ================================================== */
 .sidebar{
     position: fixed;
@@ -51,14 +46,14 @@ body{
     justify-content: space-between;
     align-items: center;
     border-radius: 40px;
+    z-index: 10; /* Garante que fique por cima do conteúdo */
 
-    /* Estética de vidro */
+    /* Glassmorphism (Efeito Vidro) */
     background: rgba(255,255,255,.12);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255,255,255,.18);
     box-shadow: 0 20px 50px rgba(0,0,0,.35);
-    z-index: 10; /* Garante que ela fique sempre por cima de tudo */
 }
 
 .sidebar ul{
@@ -69,7 +64,7 @@ body{
     gap: 30px; 
 }
 
-/* Estilização da nova logo vertical (Fecha em cima, Caixa embaixo) */
+/* Logo Vertical na Sidebar */
 .sidebar .logo {
     padding: 10px;
     text-align: center;
@@ -98,6 +93,7 @@ body{
     opacity: 0.9;
 }
 
+/* Links e Ícones da Sidebar */
 .sidebar a{
     width: 58px;
     height: 58px;
@@ -126,383 +122,47 @@ body{
 }
 
 /* ==================================================
-   DASHBOARD CONTENT (O fluxo dos containers)
-================================================== */
-.dashboard-content {
-    /* Empurra todo o fluxo para a direita para não ficar embaixo da sidebar */
-    margin-left: 160px; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 60px 20px;
-    gap: 50px; /* Distância perfeita e idêntica entre os 3 containers de vidro */
-}
-
-/* ==================================================
-   DASHBOARD CONTENT (Transformado em Grade/Grid)
-================================================== */
-.dashboard-content {
-    /* Desconta o espaço da sidebar na esquerda */
-    margin-left: 140px; 
-    padding: 30px;
-    box-sizing: border-box;
-    
-    /* Trava a altura na tela do usuário para virar um painel fixo */
-    width: calc(100vw - 140px);
-    height: calc(100vh - 120px); /* Deixa uma sobra embaixo para o footer externo */
-
-    /* --- O SEGREDO DO LAYOUT ESTÁ AQUI --- */
-    display: grid;
-    /* Divide o espaço em duas colunas: a da esquerda fica maior (1.20) e a da direita menor (1fr) */
-    grid-template-columns: 1.25fr 1fr;
-    /* Divide o espaço da direita em duas linhas de tamanhos iguais (50% cada) */
-    grid-template-rows: 1fr 1fr;
-    gap: 25px; /* Espaçamento idêntico entre os 3 containers */
-}
-
-/* ==================================================
-   POSICIONAMENTO DE CADA CONTAINER NA GRADE
-================================================== */
-
-/* Container 1 (Hero): Fica na esquerda e ocupa as duas linhas (de cima até embaixo) */
-.container-hero {
-    grid-column: 1;
-    grid-row: 1 / span 2; 
-    
-    /* Centraliza o conteúdo do Hero verticalmente dentro dele */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Container 2 (Sobre): Fica na coluna da direita, na linha 1 (Cima) */
-.container-sobre {
-    grid-column: 2;
-    grid-row: 1;
-}
-
-/* Container 3 (Funcionalidades): Fica na coluna da direita, na linha 2 (Baixo) */
-.container-funcionalidades {
-    grid-column: 2;
-    grid-row: 2;
-}
-
-/* ==================================================
-   DASHBOARD CONTENT (Controla o tamanho das colunas)
-================================================== */
-.dashboard-content {
-    margin-left: 140px; 
-    padding: 30px;
-    box-sizing: border-box;
-    
-    width: calc(100vw - 140px);
-    height: calc(100vh - 120px); 
-
-    display: grid;
-    /* Container 1 (esquerda) menor com 0.8fr, lado direito maior com 1.2fr */
-    grid-template-columns: 0.8fr 1.2fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 25px; 
-}
-
-/* ==================================================
-   ESTILO PADRÃO DOS CONTAINERS (COM O GLASSMORPHISM VIVO)
-================================================== */
-.container {
-    width: 100%;
-    height: 100%; 
-    padding: 30px; 
-    border-radius: 25px;
-    box-sizing: border-box;
-    overflow-y: auto; 
-
-    /* --- O EFEITO DE VIDRO GARANTIDO AQUI --- */
-    background: rgba(255, 255, 255, 0.08) !important;
-    backdrop-filter: blur(25px) !important;
-    -webkit-backdrop-filter: blur(25px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35) !important;
-}
-
-/* ==================================================
-   MINI CORREÇÕES DE ESPAÇAMENTO INTERNO
-================================================== */
-.features {
-    margin-bottom: 0; /* Remove aquele espaçamento antigo */
-}
-
-/* Deixa os cartões menores e em linha única ou duas para caber no container da direita */
-.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.card {
-    padding: 15px; /* Mais compacto para o painel menor */
-}
-
-.cta {
-    display: none; /* Dica: o CTA pode ser ocultado ou integrado ao Hero, pois não haverá espaço físico na caixinha da direita para ele junto com as funcionalidades */
-}
-/* ==================================================
-   CONTEÚDO INTERNO DOS CONTAINERS (Textos e Alinhamentos)
-================================================== */
-
-/* Container 1: Hero */
-.hero {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-.hero-content { max-width: 700px; }
-.hero h1 {
-    font-size: 3rem;
-    line-height: 1.2;
-    margin-bottom: 20px;
-}
-.hero p {
-    font-size: 1.1rem;
-    line-height: 1.7;
-    color: rgba(255,255,255,.85);
-    margin-bottom: 30px;
-}
-.hero-buttons{
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-/* Botões */
-.btn-primary, .btn-secondary {
-    padding: 15px 35px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: .3s ease;
-}
-.btn-primary { background: #55c26a; color: #fff; }
-.btn-primary:hover { background: #43a857; transform: translateY(-3px); }
-.btn-secondary { border: 2px solid rgba(255,255,255,.8); color: #fff; }
-.btn-secondary:hover { background: rgba(255,255,255,.15); transform: translateY(-3px); }
-
-/* Container 2: Sobre */
-.about {
-    text-align: center;
-}
-.about h2 {
-    font-size: 2.2rem;
-    margin-bottom: 25px;
-}
-.about p {
-    max-width: 850px;
-    font-size: 1.1rem;
-    line-height: 1.8;
-    margin: 0 auto 20px auto;
-    color: rgba(255,255,255,.9);
-}
-.about p:last-child { margin-bottom: 0; }
-
-/* Container 3: Funcionalidades e CTA */
-.features {
-    text-align: center;
-    margin-bottom: 60px; /* Separa as funcionalidades da seção CTA embaixo */
-}
-.features h2 {
-    font-size: 2.2rem;
-    margin-bottom: 35px;
-}
-.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px;
-}
-.card {
-    padding: 30px;
-    border-radius: 20px;
-    background: rgba(255,255,255,.05);
-    border: 1px solid rgba(255,255,255,.1);
-    transition: .3s ease;
-}
-.card:hover {
-    transform: translateY(-5px);
-    background: rgba(255,255,255,.12);
-}
-.card i { color: #00adb5; margin-bottom: 15px; }
-.card h3 { margin: 15px 0 10px; font-size: 1.3rem; }
-.card p { line-height: 1.6; color: rgba(255,255,255,.8); font-size: 0.95rem; }
-
-/* CTA dentro do container 3 */
-.cta {
-    text-align: center;
-    padding: 20px 0;
-    border-top: 1px solid rgba(255,255,255,.1); /* Linha sutil para separar as seções */
-    padding-top: 40px;
-}
-.cta h2 { font-size: 2rem; margin-bottom: 15px; }
-.cta p { margin-bottom: 25px; color: rgba(255,255,255,.85); }
-
-/* ==================================================
-   MAIN FOOTER (Totalmente externo no final da página)
+   10. MAIN FOOTER (Fixo e travado na base do site)
 ================================================== */
 .main-footer {
-    /* Ocupa a largura total da tela menos o espaço ocupado pela sidebar */
-    width: calc(100vw - 120px); 
-    
-    /* Afasta o rodapé da sidebar e centraliza o bloco no espaço restante */
-    margin-left: 120px; 
-    margin-right: auto;
+    position: fixed;        /* 👈 Fixa o footer na tela */
+    bottom: 0;              /* 👈 Cola ele exatamente na borda de baixo */
+    left: 120px;            /* 👈 Desconta o espaço da sidebar lateral esquerda */
+    width: calc(100vw - 120px); /* Ocupa toda a largura restante */
     
     text-align: center;
-    padding: 40px 20px;
-    color: rgba(255, 255, 255, 0.6);
-    box-sizing: border-box; /* Garante que os paddings não estoure a largura da tela */
+    padding: 15px 20px;     /* 👈 Reduzido de 40px para 15px para ficar discreto na base */
+    color: rgba(255, 255, 255, 0.4);
+    box-sizing: border-box; 
+    z-index: 5;             /* Garante que fique acima do fundo, mas abaixo de modais se houver */
 }
 
 .main-footer .footer-logo h3 {
     font-family: 'Poppins', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.1rem;      /* 👈 Ajustado o tamanho para melhor harmonia visual */
     color: #fff;
-    margin-bottom: 15px;
+    margin-bottom: 5px;     /* 👈 Menos espaçamento */
 }
 
 .main-footer .footer-links {
     display: flex;
     justify-content: center;
+    align-items: end;
     gap: 25px;
-    margin-bottom: 20px;
+    margin-bottom: 8px;     /* 👈 Menos espaçamento */
 }
 
 .main-footer .footer-links a {
     color: rgba(255, 255, 255, 0.6);
     text-decoration: none;
-    font-size: 0.95rem;
+    font-size: 0.85rem;     /* 👈 Links ligeiramente menores */
     transition: color 0.2s;
 }
 
 .main-footer .footer-links a:hover {
-    color: #00adb5; /* Acende com a cor tema ao passar o mouse */
+    color: #00adb5; 
 }
 
 .main-footer p {
-    font-size: 0.85rem;
-}
-
-/* ==================================================
-   PAGINA DE CONTAGEM (SISTEMA)
-================================================== */
-
-.btn-iniciar {
-    width: 100%;             /* Faz o botão preencher toda a largura disponível do formulário */
-    display: flex;
-    justify-content: center; /* Centraliza o texto e o ícone internamente */
-    align-items: center;
-    gap: 10px;               /* Dá um espaço de 10px entre o texto e a setinha */
-    
-    padding: 16px;           /* Altura confortável para o clique */
-    font-size: 1.1rem;
-    font-family: 'Poppins', sans-serif;
-    font-weight: bold;
-    
-    border: none;
-    cursor: pointer;
-    
-    /* Copia o verde padrão que você já usa no seu sistema */
-    background: #55c26a; 
-    color: #fff;
-    border-radius: 50px;     /* Formato pílula combinando com os botões do Hero */
-    
-    /* Transição suave para o efeito de passar o mouse */
-    transition: all 0.3s ease; 
-    
-    /* Sombra verde sutil para dar efeito de profundidade (Glow) */
-    box-shadow: 0 10px 20px rgba(85, 194, 106, 0.2); 
-}
-
-/* Efeito ao passar o mouse */
-.btn-iniciar:hover {
-    background: #43a857;     /* Escurece o verde levemente */
-    transform: translateY(-2px); /* Faz o botão dar um leve "salto" para cima */
-    box-shadow: 0 12px 25px rgba(85, 194, 106, 0.35); /* Clarea e aumenta a sombra */
-}
-
-/* Efeito ao clicar no botão */
-.btn-iniciar:active {
-    transform: translateY(0); /* O botão volta para a posição normal simulando o clique físico */
-}
-
-/* Container das opções */
-.opcoes-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 15px;
-    margin-bottom: 30px; /* Dá espaço para o botão embaixo */
-}
-
-/* O card que funciona como label */
-.card-opcao {
-    cursor: pointer;
-    display: block;
-    width: 100%;
-}
-
-/* Esconde o círculo padrão do input radio */
-.card-opcao input[type="radio"] {
-    display: none;
-}
-
-/* Estrutura visual do Card (Efeito Vidro) */
-.card-conteudo {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-
-/* Efeito de Hover comum */
-.card-opcao:hover .card-conteudo {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* --- O SEGREDO DO CARD SELECIONADO --- */
-/* Quando o radio escondido for checado, muda a cor do card inteiro */
-.card-opcao input[type="radio"]:checked + .card-conteudo {
-    background: rgba(0, 173, 181, 0.15); /* Cor tema com transparência */
-    border-color: #00adb5; /* Borda acesa com a cor da logo */
-    box-shadow: 0 0 15px rgba(0, 173, 181, 0.2);
-}
-
-/* Organização interna do texto do card */
-.emoji { font-size: 1.8rem; }
-.info-opcao h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-.info-opcao p { font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); }
-
-/* ==================================================
-   ESTILIZAÇÃO DO BOTÃO INICIAR
-================================================== */
-.btn-iniciar {
-    width: 100%; /* Ocupa a largura total do formulário */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px; /* Espaço entre o texto e a setinha */
-    padding: 16px;
-    font-size: 1.1rem;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 10px 20px rgba(85, 194, 106, 0.2);
-}
-
-.btn-iniciar:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 25px rgba(85, 194, 106, 0.3);
+    font-size: 0.75rem;     /* 👈 Texto de copyright menor e discreto */
 }
