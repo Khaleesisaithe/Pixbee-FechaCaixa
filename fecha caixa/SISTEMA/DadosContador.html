@@ -127,13 +127,34 @@
 
                 <!-- 4. BASE DO CONTAINER: Botão Iniciar e Aviso -->
                 <div class="bloco-botao-base">
-                    <button type="submit" class="btn-iniciar">
+                    <button type="submit" id="btnIniciar" class="btn-iniciar">
                         Iniciar Contagem <i class="fa-solid fa-arrow-right"></i>
                     </button>
                     <p class="nota-privacidade">🔒 As informações são processadas de forma 100% local e segura.</p>
                 </div>
 
             </form>
+        </div>
+
+        <div id="mensagemErro" class="mensagem-erro">
+
+        <div class="bloco-botao-base">
+
+        <div id="backdropErro" class="backdrop-erro"></div>
+
+        <div id="mensagemErro" class="mensagem-erro"></div>
+
+    <button 
+        type="submit" 
+        id="btnIniciar"
+        class="btn-iniciar">
+
+        Iniciar Contagem 
+        <i class="fa-solid fa-arrow-right"></i>
+
+    </button>
+
+</div>
         </div>
 
             <!-- ================= FOOTER (AGORA FORA DOS CONTAINERS) ================= -->
@@ -149,7 +170,9 @@
         <p>© 2026 PixBee • Projeto Acadêmico da @KhaleesiSaithe</p>
     </footer>
 
-    <!-- Scripts carregados estritamente antes do fim do body -->
-    <script src="JS/script.js"></script>
-
     </main>
+
+        <!-- Scripts carregados estritamente antes do fim do body -->
+    <script src="../JS/DadosContador.js"></script>
+
+</body>

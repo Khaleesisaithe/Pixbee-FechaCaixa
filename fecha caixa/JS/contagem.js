@@ -1,21 +1,104 @@
-<h3>Operador: <span id="operador"></span></h3>
-<h3>Empresa: <span id="empresa"></span></h3>
-<h3>Fundo: <span id="fundo"></span></h3>
+// ======================================
+// CONTAGEM.JS
+// ======================================
 
-<input id="m005" type="number" placeholder="Moedas de 5 centavos">
-<input id="m010" type="number">
-<input id="m025" type="number">
-<input id="m050" type="number">
-<input id="m100" type="number">
+// Recupera os dados da página anterior
+const dadosCaixa = JSON.parse(localStorage.getItem("dadosCaixa"));
 
-<input id="n2" type="number">
-<input id="n5" type="number">
-<input id="n10" type="number">
-<input id="n20" type="number">
-<input id="n50" type="number">
-<input id="n100" type="number">
-<input id="n200" type="number">
+if (!dadosCaixa) {
+    alert("Nenhuma contagem iniciada.");
+    window.location.href = "dados.html";
+}
 
-<h1>Total: <span id="total">R$ 0,00</span></h1>
+// Exibe os dados iniciais
+atualizarTela();
 
-<script src="contagem.js"></script>
+// Sempre que algum campo mudar, recalcula
+document.querySelectorAll("input").forEach(campo => {
+    campo.addEventListener("input", calcularTotal);
+});
+
+// Faz o primeiro cálculo
+calcularTotal();
+
+
+// ======================================
+// Calcula todas as moedas
+// ======================================
+
+function calcularMoedas() {
+
+    let totalMoedas = 0;
+
+    totalMoedas += (Number(document.getElementById("m005").value) || 0) * 0.05;
+    totalMoedas += (Number(document.getElementById("m010").value) || 0) * 0.10;
+    totalMoedas += (Number(document.getElementById("m025").value) || 0) * 0.25;
+    totalMoedas += (Number(document.getElementById("m050").value) || 0) * 0.50;
+    totalMoedas += (Number(document.getElementById("m100").value) || 0) * 1.00;
+
+    return totalMoedas;
+
+}
+
+
+// ======================================
+// Calcula todas as cédulas
+// ======================================
+
+function calcularCedulas() {
+
+    let totalCedulas = 0;
+
+    totalCedulas += (Number(document.getElementById("n2").value) || 0) * 2;
+    totalCedulas += (Number(document.getElementById("n5").value) || 0) * 5;
+    totalCedulas += (Number(document.getElementById("n10").value) || 0) * 10;
+    totalCedulas += (Number(document.getElementById("n20").value) || 0) * 20;
+    totalCedulas += (Number(document.getElementById("n50").value) || 0) * 50;
+    totalCedulas += (Number(document.getElementById("n100").value) || 0) * 100;
+    totalCedulas += (Number(document.getElementById("n200").value) || 0) * 200;
+
+    return totalCedulas;
+
+}
+
+
+// ======================================
+// Calcula o valor total
+// ======================================
+
+function calcularTotal() {
+
+    const moedas = calcularMoedas();
+
+    const cedulas = calcularCedulas();
+
+    const total = moedas + cedulas;
+
+    document.getElementById("total").textContent =
+        total.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+
+}
+
+
+// ======================================
+// Atualiza as informações da tela
+// ======================================
+
+function atualizarTela() {
+
+    document.getElementById("operador").textContent =
+        dadosCaixa.operador;
+
+    document.getElementById("empresa").textContent =
+        dadosCaixa.empresa;
+
+    document.getElementById("fundo").textContent =
+        Number(dadosCaixa.fundo).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+
+}

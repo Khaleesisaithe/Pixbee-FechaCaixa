@@ -183,4 +183,140 @@
     transform: scale(.98);
 }
 
+.mensagem-erro {
 
+    position: fixed;
+
+    top: 50%;
+
+    left: 50%;
+
+    width: 380px;
+
+    z-index: 9999;
+
+
+    transform: translate(-50%, -50%);
+
+
+    background: rgba(239, 247, 210, 0.96);
+
+    border: 1px solid rgba(180, 200, 120, 0.8);
+
+    border-left: 6px solid #b7c96b;
+
+
+    color: #56652b;
+
+    padding: 22px;
+
+    border-radius: 18px;
+
+
+    box-shadow:
+    0 20px 50px rgba(80,100,40,0.25);
+
+
+    opacity: 0;
+
+    pointer-events: none;
+
+}
+
+/* Entrada */
+
+.mensagem-erro.mostrar {
+
+    animation: entrarAviso 0.4s forwards;
+
+}
+
+
+/* Saída */
+
+.mensagem-erro.sair {
+
+    animation: sairAviso 0.5s forwards;
+
+}
+
+
+
+@keyframes entrarAviso {
+
+    from {
+
+        opacity: 0;
+
+        transform: translate(-50%, -60%);
+
+    }
+
+
+    to {
+
+        opacity: 1;
+
+        transform: translate(-50%, -50%);
+
+    }
+
+}
+
+
+@keyframes sairAviso {
+
+    from {
+
+        opacity: 1;
+
+        transform: translate(-50%, -50%);
+
+    }
+
+
+    to {
+
+        opacity: 0;
+
+        transform: translate(-50%, -40%);
+
+    }
+
+}
+
+.backdrop-erro {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(80, 100, 60, 0.18);
+
+    backdrop-filter: blur(4px);
+
+    z-index: 9998;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: opacity 0.4s ease;
+
+}
+
+
+.backdrop-erro.mostrar {
+
+    opacity: 1;
+
+    pointer-events: all;
+
+}
+
+
+.backdrop-erro.sair {
+
+    opacity: 0;
+
+}
