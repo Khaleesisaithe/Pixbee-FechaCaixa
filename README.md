@@ -1,167 +1,59 @@
-# Pixbee-FechaCaixa
-ContaCaixa  Sistema web desenvolvido para simplificar a contagem e o fechamento de caixa de estabelecimentos comerciais. O projeto oferece uma interface moderna, intuitiva e responsiva para calcular automaticamente moedas, notas e formas de pagamento, reduzindo erros e agilizando o processo de conferência diária. Atualmente está em desenvolvimento
+# PixBee FechaCaixa
 
-# 💰 ContaCaixa
+Sistema web de contagem e fechamento de caixa para organizar a abertura do turno, registrar movimentações, conferir meios de pagamento e documentar divergências.
 
-Sistema web para contagem e fechamento de caixa desenvolvido para facilitar a conferência de valores em estabelecimentos comerciais.
+> **Autoria e desenvolvimento:** projeto idealizado e mantido por **Khaleesi Saithe**. A implementação foi desenvolvida com **assistência de IA**, com decisões de produto, regras de negócio, dados e revisão sob responsabilidade da autora.
 
-O objetivo do projeto é oferecer uma ferramenta rápida, intuitiva e precisa para auxiliar operadores de caixa, gerentes e conferentes durante o fechamento diário.
+## O que o sistema faz
 
----
+O PixBee acompanha o operador em quatro etapas: abertura, seleção dos meios de recebimento, contagem e validação. Durante o turno, ele registra sangrias e suprimentos individualmente, exige justificativa para alterações e preserva uma trilha de auditoria no histórico local e nos comprovantes térmicos.
 
-## 🚀 Status do Projeto
+Os turnos ficam no navegador por até três dias. Antes da limpeza, a pessoa pode consultar, imprimir ou exportar o relatório em PDF. O projeto também inclui alto contraste, rótulos de navegação para celular e uma página de privacidade e direitos.
 
-🚧 Em desenvolvimento
+## Tecnologias
 
-Este projeto está sendo desenvolvido do zero e novas funcionalidades serão adicionadas continuamente.
+| Camada | Ferramentas |
+| --- | --- |
+| Interface | React, TypeScript e Tailwind CSS |
+| Navegação | Wouter |
+| Componentes | Radix UI, shadcn/ui e Lucide |
+| Relatórios | jsPDF |
+| Persistência | `localStorage` do navegador |
+| Desenvolvimento | Vite, pnpm e Prettier |
 
----
+## Estrutura do projeto
 
-## ✨ Funcionalidades Planejadas
-
-- ✅ Contagem de moedas
-- ✅ Contagem de notas
-- ✅ Cálculo automático dos valores
-- ✅ Total geral em tempo real
-- ✅ Contagem de PIX
-- ✅ Contagem de Cartão de Débito
-- ✅ Contagem de Cartão de Crédito
-- ✅ Vales e vouchers
-- ✅ Sangria
-- ✅ Suprimento de caixa
-- ✅ Comparação entre valor esperado e valor encontrado
-- ✅ Diferença de caixa (sobra/falta)
-- ✅ Impressão do fechamento
-- ✅ Exportação em PDF
-- ✅ Histórico de contagens
-- ✅ Relatórios
-- ✅ Interface responsiva
-
----
-
-## 🛠️ Tecnologias
-
-- HTML5
-- CSS3
-- JavaScript (ES6+)
-
-### Futuramente
-
-- React
-- TypeScript
-- Node.js
-- Supabase
-- Vercel
-
----
-
-## 📁 Estrutura do Projeto
-
-```
-ContaCaixa/
-│
-├── index.html
-├── sobre.html
-├── contato.html
-│
-├── sistema/
-│   ├── dashboard.html
-│   ├── contagem.html
-│   ├── fechamento.html
-│   ├── historico.html
-│   ├── relatorios.html
-│   ├── configuracoes.html
-│   └── ajuda.html
-│
-├── css/
-│
-├── js/
-│
-├── assets/
-│   ├── images/
-│   ├── icons/
-│   ├── fonts/
-│   └── logo/
-│
-└── README.md
+```text
+client/
+  src/
+    components/     Componentes reutilizáveis e elementos de interface
+    contexts/       Estado da sessão de caixa e persistência local
+    pages/          Telas do fluxo operacional e páginas institucionais
+    index.css       Tokens, layout, responsividade e acessibilidade
+docs/               Arquitetura, integração de caixa e orientações de publicação
+server/             Servidor estático usado apenas no ambiente atual
 ```
 
----
+Consulte [`docs/architecture.md`](docs/architecture.md) para entender a responsabilidade de cada área e [`docs/github-vercel.md`](docs/github-vercel.md) para a atualização do repositório e da hospedagem.
 
-## 🎯 Objetivos
+## Executar localmente
 
-- Tornar o fechamento de caixa mais rápido.
-- Reduzir erros de conferência.
-- Criar uma interface simples e intuitiva.
-- Evoluir para uma plataforma profissional de gestão de fechamento de caixa.
+```bash
+pnpm install
+pnpm dev
+```
 
----
+Para conferir a versão de produção:
 
-## 💡 Público-alvo
+```bash
+pnpm build
+pnpm preview
+```
 
-- Mercados
-- Padarias
-- Lojas de conveniência
-- Farmácias
-- Restaurantes
-- Lojas de varejo
-- Pequenos comércios
-- Operadores de caixa
-- Gerentes
+## Privacidade e autoria
 
----
+O PixBee não usa banco de dados neste estágio. Dados operacionais permanecem no navegador do operador e podem ser removidos pela própria pessoa. Os avisos de uso, armazenamento local e direitos autorais estão na rota `/privacidade` e em [`docs/legal-references.md`](docs/legal-references.md).
 
-## 📱 Responsividade
+## Publicação externa
 
-O sistema será desenvolvido para funcionar em:
-
-- 💻 Computadores
-
----
-
-## 📌 Roadmap
-
-### Versão 1.0
-
-- Página institucional
-- Sistema de contagem
-- Fechamento de caixa
-- Impressão
-
-### Versão 2.0
-
-- Histórico
-- Relatórios
-- PDF
-
-### Versão 3.0
-
-- Login
-- Banco de dados
-- Multiusuários
-- Múltiplas lojas
-
-### Versão 4.0
-
-- SaaS
-- Assinaturas
-- Painel administrativo
-- API
-
----
-
-## 🤝 Contribuições
-
-Este projeto está em desenvolvimento. Sugestões e melhorias são sempre bem-vindas.
-
----
-
-## 📄 Licença
-
-Todos os direitos reservados.
-
-Este projeto não pode ser copiado, distribuído ou utilizado comercialmente sem autorização do autor.
-
----
-
-Desenvolvido com dedicação para transformar a rotina de fechamento de caixa em um processo simples, rápido e confiável.
+Para GitHub e Vercel, utilize o pacote independente preparado junto com esta entrega. Ele substitui dependências específicas do ambiente de desenvolvimento por ativos locais e uma configuração Vite padrão. As etapas estão em [`docs/github-vercel.md`](docs/github-vercel.md).
