@@ -44,6 +44,7 @@ pids
 *.pid
 *.seed
 *.pid.lock
+*.bak
 
 # Coverage directory used by tools like istanbul
 coverage/
@@ -105,7 +106,18 @@ temp/
 *.sqlite
 *.sqlite3
 
-# Arquivos locais de configuração e entrega
+# Webdev artifacts (checkpoint zips, migrations, etc.)
+.webdev/
+
+# Manus version file (auto-generated, not part of source)
+client/public/__manus__/version.json
+.project-config.json
+
+# Ambiente de desenvolvimento e telemetria local
+.manus-logs/
+client/public/__manus__/
 *.local
+
+# Arquivos de entrega gerados localmente
 release/
 downloads/
