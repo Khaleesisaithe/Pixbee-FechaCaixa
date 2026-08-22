@@ -1,59 +1,72 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/client/public/assets/pixbee-bee-mark.png" width="88" alt="Símbolo PixBee" />
+</p>
+
 # PixBee FechaCaixa
 
-Sistema web de contagem e fechamento de caixa para organizar a abertura do turno, registrar movimentações, conferir meios de pagamento e documentar divergências.
+> **Mais clareza, menos retrabalho no fechamento de caixa.**
 
-> **Autoria e desenvolvimento:** projeto idealizado e mantido por **Khaleesi Saithe**. A implementação foi desenvolvida com **assistência de IA**, com decisões de produto, regras de negócio, dados e revisão sob responsabilidade da autora.
+[![Abrir PixBee](https://img.shields.io/badge/Acessar_PixBee-55C26A?style=for-the-badge&logo=vercel&logoColor=white)](https://pixbee-red.vercel.app/)
+[![Versão ao vivo](https://img.shields.io/badge/Status-Ao_vivo-00ADB5?style=for-the-badge&logoColor=white)](https://pixbee-red.vercel.app/)
+[![Tecnologia](https://img.shields.io/badge/React_%2B_TypeScript-Vite-1E293B?style=for-the-badge&logo=react&logoColor=61DAFB)](https://github.com/Khaleesisaithe/Pixbee-FechaCaixa)
 
-## O que o sistema faz
+**[Abrir o sistema ao vivo](https://pixbee-red.vercel.app/)** · **[Conhecer a autora](#por-trás-do-projeto)** · **[Ver a privacidade](https://pixbee-red.vercel.app/privacidade)**
 
-O PixBee acompanha o operador em quatro etapas: abertura, seleção dos meios de recebimento, contagem e validação. Durante o turno, ele registra sangrias e suprimentos individualmente, exige justificativa para alterações e preserva uma trilha de auditoria no histórico local e nos comprovantes térmicos.
+O **PixBee FechaCaixa** é uma ferramenta web criada para quem vive a rotina de operação, atendimento e conferência de caixa. Ele organiza a abertura do turno, registra movimentações, acompanha a contagem e torna a conciliação mais clara antes do fechamento.
 
-Os turnos ficam no navegador por até três dias. Antes da limpeza, a pessoa pode consultar, imprimir ou exportar o relatório em PDF. O projeto também inclui alto contraste, rótulos de navegação para celular e uma página de privacidade e direitos.
+## Um fluxo simples para uma rotina exigente
 
-## Tecnologias
-
-| Camada | Ferramentas |
+| Etapa | O que acontece no PixBee |
 | --- | --- |
-| Interface | React, TypeScript e Tailwind CSS |
-| Navegação | Wouter |
+| **1. Abertura** | Identifique o operador, a empresa, o fundo inicial e os meios de recebimento do turno. |
+| **2. Contagem** | Registre cédulas, moedas, Pix, cartões, sangrias, suprimentos e entradas acumuladas em espécie. |
+| **3. Conciliação** | Compare o valor esperado ao valor encontrado e identifique sobra ou falta por modalidade. |
+| **4. Fechamento** | Valide o turno, emita o comprovante térmico e mantenha o histórico disponível para consulta. |
+
+> Uma divergência não impede a conclusão do caixa. O sistema registra a diferença para que o fechamento aconteça com informação e rastreabilidade.
+
+## Recursos que fazem diferença
+
+| Recurso | Como ajuda na operação |
+| --- | --- |
+| **Entradas em espécie acumuladas** | Cada valor informado soma automaticamente ao esperado em dinheiro. |
+| **Sangrias e suprimentos** | Lançamentos individuais com horário, edição, exclusão justificada e trilha de auditoria. |
+| **Comprovante Epson** | Layout preparado para impressão térmica em bobina de 80 mm diretamente pelo navegador. |
+| **Histórico local por três dias** | Turnos ficam disponíveis no navegador para consulta, impressão e arquivamento. |
+| **Relatório em PDF** | Consolida turnos, totais, lançamentos e eventos de auditoria para download. |
+| **Acessibilidade** | Alto contraste persistente e rótulos de apoio para navegação em celular. |
+| **Experiência do cliente** | Canal de relato e sugestão integrado ao formulário hospedado. |
+
+## Privacidade por padrão
+
+Os dados operacionais do caixa permanecem no navegador utilizado pelo operador. O PixBee não depende de um banco de dados remoto para registrar os turnos atuais. Após três dias, o sistema apresenta opções para imprimir ou baixar o relatório antes da limpeza assistida do histórico local.
+
+A versão online funciona em **[pixbee-red.vercel.app](https://pixbee-red.vercel.app/)**. Ela pode ser acessada por um botão ou item de menu no WordPress, em uma página própria, preservando a impressão térmica, a tela inteira em celular e o armazenamento local.
+
+## Tecnologias do projeto
+
+| Área | Tecnologias |
+| --- | --- |
+| Interface | React, TypeScript, Tailwind CSS e Vite |
 | Componentes | Radix UI, shadcn/ui e Lucide |
-| Relatórios | jsPDF |
-| Persistência | `localStorage` do navegador |
-| Desenvolvimento | Vite, pnpm e Prettier |
+| Navegação | Wouter |
+| Relatórios | jsPDF e impressão pelo navegador |
+| Dados do turno | `localStorage` do navegador |
+| Formulário | Formspree |
+| Publicação | Vercel |
 
-## Estrutura do projeto
+## Por trás do projeto
 
-```text
-client/
-  src/
-    components/     Componentes reutilizáveis e elementos de interface
-    contexts/       Estado da sessão de caixa e persistência local
-    pages/          Telas do fluxo operacional e páginas institucionais
-    index.css       Tokens, layout, responsividade e acessibilidade
-docs/               Arquitetura, integração de caixa e orientações de publicação
-server/             Servidor estático usado apenas no ambiente atual
-```
+**Khaleesi Saithe** está em transição de operações e varejo para Ciência de Dados, cursando Estácio de Sá. Seus projetos partem de situações reais de atendimento e conferência: o **PDFToolkit**, voltado a relatórios de vendas em PDF, e o **PixBee/ContaCaixa**, pensado para simplificar o fechamento de caixa no dia a dia.
 
-Consulte [`docs/architecture.md`](docs/architecture.md) para entender a responsabilidade de cada área e [`docs/github-vercel.md`](docs/github-vercel.md) para a atualização do repositório e da hospedagem.
+| Canal | Acesso |
+| --- | --- |
+| Portfólio | [khaleesi-portifolio.vercel.app](https://khaleesi-portifolio.vercel.app/) |
+| LinkedIn | [linkedin.com/in/khaleesisaithen](https://www.linkedin.com/in/khaleesisaithen) |
+| GitHub | [github.com/khaleesisaithe](https://github.com/khaleesisaithe) |
 
-## Executar localmente
+## Transparência e direitos
 
-```bash
-pnpm install
-pnpm dev
-```
+O PixBee é um projeto autoral de **Khaleesi Saithe**, desenvolvido com assistência de ferramentas de IA e revisão humana das decisões de produto e negócio. Os avisos de uso, retenção local, privacidade e direitos autorais estão disponíveis dentro do aplicativo em **[Privacidade](https://pixbee-red.vercel.app/privacidade)**.
 
-Para conferir a versão de produção:
-
-```bash
-pnpm build
-pnpm preview
-```
-
-## Privacidade e autoria
-
-O PixBee não usa banco de dados neste estágio. Dados operacionais permanecem no navegador do operador e podem ser removidos pela própria pessoa. Os avisos de uso, armazenamento local e direitos autorais estão na rota `/privacidade` e em [`docs/legal-references.md`](docs/legal-references.md).
-
-## Publicação externa
-
-Para GitHub e Vercel, utilize o pacote independente preparado junto com esta entrega. Ele substitui dependências específicas do ambiente de desenvolvimento por ativos locais e uma configuração Vite padrão. As etapas estão em [`docs/github-vercel.md`](docs/github-vercel.md).
+**© Khaleesi Saithe. Todos os direitos reservados.**
