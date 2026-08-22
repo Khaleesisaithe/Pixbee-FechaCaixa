@@ -15,6 +15,8 @@ O repositório preparado para o GitHub foi analisado para arquivos de ambiente, 
 
 Publique o PixBee na Vercel e conecte o endereço gerado ao WordPress com um botão ou item de menu. A navegação para uma página própria é preferível ao iframe para preservar impressão térmica, espaço de tela em celular e o comportamento de armazenamento local.
 
+O arquivo `vercel.json` já define `outputDirectory` como `dist/public`, que é onde o build do PixBee entrega os arquivos estáticos, e mantém o redirecionamento de rotas para `index.html`. Dessa forma, os caminhos internos do aplicativo continuam acessíveis diretamente após a publicação.[1]
+
 ## Variáveis de ambiente
 
 Para a versão atual, que usa armazenamento local e Formspree, nenhuma variável adicional é obrigatória na Vercel. Não crie nem envie arquivos de ambiente ao GitHub.
@@ -32,12 +34,14 @@ Se o login OAuth for ativado no futuro, configure os valores exclusivamente no p
 
 ## Google Analytics e Search Console
 
-Google Analytics permanece desativado até a criação de uma propriedade GA4. Quando houver um ID de medição `G-...`, use a mesma propriedade no WordPress e no PixBee. Se estiverem em domínios diferentes, configure medição entre domínios para preservar a sessão do visitante.[1]
+Google Analytics permanece desativado até a criação de uma propriedade GA4. Quando houver um ID de medição `G-...`, use a mesma propriedade no WordPress e no PixBee. Se estiverem em domínios diferentes, configure medição entre domínios para preservar a sessão do visitante.[2]
 
-Após conectar um domínio à Vercel, verifique-o no Google Search Console. A verificação por domínio é a opção mais abrangente para cobrir subdomínios; mantenha o método de verificação ativo para preservar o acesso.[2]
+Após conectar um domínio à Vercel, verifique-o no Google Search Console. A verificação por domínio é a opção mais abrangente para cobrir subdomínios; mantenha o método de verificação ativo para preservar o acesso.[3]
 
 ## Referências
 
-[1] [Google Analytics — Configurar medição entre domínios](https://support.google.com/analytics/answer/10071811?hl=pt-BR)
+[1] [Vercel — Vite on Vercel](https://vercel.com/docs/frameworks/frontend/vite)
 
-[2] [Google Search Console — Verificar a propriedade do site](https://support.google.com/webmasters/answer/9008080?hl=pt-BR)
+[2] [Google Analytics — Configurar medição entre domínios](https://support.google.com/analytics/answer/10071811?hl=pt-BR)
+
+[3] [Google Search Console — Verificar a propriedade do site](https://support.google.com/webmasters/answer/9008080?hl=pt-BR)
