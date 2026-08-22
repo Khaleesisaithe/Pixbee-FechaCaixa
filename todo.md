@@ -232,7 +232,16 @@ A extração textual do PDF confirmou literalmente: “ENTRADAS EM ESPÉCIE · 3
 - [x] Confirmar o repositório GitHub de destino: Khaleesisaithe/Pixbee-FechaCaixa.
 - [x] Preparar a cópia de trabalho com os arquivos atuais do PixBee e ativos locais independentes.
 - [x] Revisar as diferenças com o repositório existente antes do envio.
-- [ ] Enviar a versão aprovada ao repositório e orientar a abertura no VS Code.
+- [x] Enviar a versão aprovada à branch main do repositório.
+- [ ] Orientar a abertura e a execução do repositório atualizado no VS Code ou Codespaces.
+- [ ] Confirmar que a usuária conseguiu abrir a versão atualizada no ambiente escolhido.
+
+## Correção: inicialização no GitHub Codespaces
+
+- [x] Diagnosticar a ausência do executável `tsx` após a instalação limpa de dependências.
+- [x] Declarar `tsx` nas dependências de desenvolvimento e atualizar o lockfile.
+- [x] Validar `pnpm dev` em uma instalação limpa.
+- [ ] Enviar a correção à branch main e orientar a sincronização no Codespaces.
 
 ## Experiência do cliente
 
