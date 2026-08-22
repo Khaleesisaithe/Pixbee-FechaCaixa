@@ -9,7 +9,6 @@
     <img src="https://img.shields.io/badge/feito%20com-React%20%2B%20TypeScript-00ADB5?style=for-the-badge" alt="Feito com React e TypeScript" />
     <img src="https://img.shields.io/badge/foco-opera%C3%A7%C3%A3o%20de%20caixa-183D29?style=for-the-badge" alt="Foco: operação de caixa" />
   </p>
-</div> <img src="./client/public/assets/pixbee-fundo-original.jpg" alt="Identidade visual verde do PixBee FechaCaixa" width="100%" />
 
 ## 🐝 O que é o PixBee?
 
