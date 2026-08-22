@@ -76,20 +76,46 @@ O PixBee organiza a abertura do turno, o registro de movimentações, a contagem
   <sub>Percentuais atuais calculados automaticamente pelo GitHub a partir dos arquivos versionados. Bibliotecas e plataformas aparecem na seção de ferramentas, pois não são linguagens de programação.</sub>
 </p>
 
-## PixBee em funcionamento
+## Como utilizar o PixBee
+
+### 1. Registre a contagem e as entradas em espécie
+
+Na etapa de contagem, informe o que entrou no caixa e registre cada valor recebido em espécie. As entradas são acumuladas automaticamente no valor esperado, enquanto o resumo lateral acompanha a conferência em tempo real.
 
 <p align="center">
-  <img width="100%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-inicio.png" alt="Tela inicial do PixBee FechaCaixa" />
+  <img width="100%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-contagem.png" alt="Tela de contagem do PixBee com entradas acumuladas em espécie" />
   <br />
-  <sub>Início do fluxo de fechamento</sub>
-  <br /><br />
-  <img width="100%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-historico.png" alt="Histórico de turnos e relatório do PixBee" />
+  <sub>Contagem em andamento: fundo inicial, entradas acumuladas, dinheiro físico e resumo do turno.</sub>
+</p>
+
+### 2. Valide o fechamento e imprima o comprovante
+
+Depois de conferir os valores, valide o fechamento. O PixBee mostra a diferença geral e por modalidade; após a validação, libera o comprovante preparado para impressão térmica Epson em bobina de 80 mm.
+
+<p align="center">
+  <img width="100%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-validacao-impressao.png" alt="Tela de validação do PixBee com botão de imprimir comprovante" />
   <br />
-  <sub>Histórico local, impressão e relatório PDF</sub>
-  <br /><br />
-  <img width="100%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-privacidade.png" alt="Tela de privacidade e direitos do PixBee" />
+  <sub>Validação do fechamento: conciliação, divergência e acesso ao comprovante térmico.</sub>
+</p>
+
+### 3. Entenda como seus dados são tratados
+
+Os dados do turno ficam no navegador utilizado pela pessoa operadora. A página de privacidade explica a retenção local, os controles de exclusão, os cuidados recomendados e os direitos relacionados ao uso do sistema.
+
+<p align="center">
+  <img width="100%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-privacidade-interativa.png" alt="Tela de privacidade e direitos do PixBee" />
   <br />
-  <sub>Privacidade, retenção local e direitos</sub>
+  <sub>Privacidade e direitos: informações claras sobre armazenamento local e operação responsável.</sub>
+</p>
+
+### 4. Entre em contato, relate um problema ou envie uma sugestão
+
+Use o formulário de experiência para relatar um problema, sugerir melhorias ou compartilhar ideias de uso. O formulário permite identificar o perfil, registrar o contexto e autorizar o contato de resposta, sem misturar essas informações ao histórico financeiro local.
+
+<p align="center">
+  <img width="100%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-formulario-contato.png" alt="Formulário de experiência e contato do PixBee" />
+  <br />
+  <sub>Canal de contato: problemas, sugestões e melhorias para evolução contínua do PixBee.</sub>
 </p>
 
 ## Privacidade e operação local
@@ -98,6 +124,16 @@ Os dados do turno ficam no navegador utilizado pelo operador. O histórico perma
 
 <p align="center">
   <a href="https://pixbee-red.vercel.app/privacidade">Ler a política de privacidade</a>
+</p>
+
+## Apoie o crescimento do PixBee
+
+O PixBee é um projeto independente em evolução. Uma contribuição voluntária ajuda a cobrir custos de domínio, manter a presença online e viabilizar melhorias futuras, como novos recursos de operação, documentação e experiências de uso mais completas.
+
+<p align="center">
+  <strong>Contribuição via Pix</strong><br />
+  <code>51.063.137/0001-26</code><br />
+  <sub>Chave Pix (CNPJ) · Apoio voluntário para domínio, manutenção e crescimento do projeto.</sub>
 </p>
 
 ## Autoria

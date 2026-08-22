@@ -73,6 +73,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import { jsPDF } from "jspdf";
+import { isDevelopmentPreviewEnabled } from "@/lib/feedbackPreview";
 
 const NOTE_DENOMINATIONS = [
   { key: "n200", label: "R$ 200", value: 200 },
@@ -1937,6 +1938,12 @@ function CountPage() {
 function ValidationPage() {
   const [, navigate] = useLocation();
   const { session, setSession, resetSession } = useCashSession();
+  const isPrintPreview = isDevelopmentPreviewEnabled(
+    typeof window === "undefined" ? "" : window.location.search,
+    import.meta.env.DEV,
+    "preview-print"
+  );
+  const canPrintReceipt = Boolean(session.validatedAt) || isPrintPreview;
   const cashSelected = session.selectedMethods.includes("cash");
   const notes = NOTE_DENOMINATIONS.reduce(
     (total, item) => total + item.value * (session.quantities[item.key] ?? 0),
@@ -2186,13 +2193,23 @@ function ValidationPage() {
                 </span>
               </div>
             </div>
+          ) : isPrintPreview ? (
+            <div className="validated-banner">
+              <CheckCircle2 size={22} />
+              <div>
+                <strong>Prévia do comprovante térmico.</strong>
+                <span>
+                  A ação de impressão aparece aqui após validar um fechamento.
+                </span>
+              </div>
+            </div>
           ) : null}
           <div className="flow-actions closure-actions">
             <Link href="/contagem" className="pixbee-text-button">
               <ArrowLeft size={17} /> Ajustar contagem
             </Link>
             <div>
-              {session.validatedAt ? (
+              {canPrintReceipt ? (
                 <Button
                   className="pixbee-print-button"
                   onClick={() => window.print()}
@@ -2200,7 +2217,7 @@ function ValidationPage() {
                   <Printer size={18} /> Imprimir comprovante
                 </Button>
               ) : null}
-              {session.validatedAt ? (
+              {canPrintReceipt ? (
                 <Button
                   className="pixbee-primary-button"
                   onClick={() => {

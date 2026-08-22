@@ -13,6 +13,7 @@ import {
   isFeedbackHoneypotTriggered,
   type CustomerFeedbackForm,
 } from "@/lib/customerFeedback";
+import { isFeedbackPreviewEnabled } from "@/lib/feedbackPreview";
 import { MessageCircle, Send } from "lucide-react";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { type FormEvent, useState } from "react";
@@ -32,7 +33,12 @@ const initialForm: CustomerFeedbackForm = {
 
 /** Canal público de relatos encaminhado pelo formulário hospedado da autora. */
 export function CustomerFeedbackWidget() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(() =>
+    isFeedbackPreviewEnabled(
+      typeof window === "undefined" ? "" : window.location.search,
+      import.meta.env.DEV
+    )
+  );
   const [form, setForm] = useState<CustomerFeedbackForm>(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
