@@ -13,6 +13,17 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*
+!.env.example
+
+# Certificates, signing keys and local credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.keystore
 
 # IDE and editor files
 .vscode/
@@ -121,3 +132,11 @@ client/public/__manus__/
 # Arquivos de entrega gerados localmente
 release/
 downloads/
+
+# Hosting providers and internal planning
+.vercel/
+.netlify/
+todo.md
+template.json
+ideas.md
+screenshots/

@@ -3532,3 +3532,78 @@ html.pixbee-high-contrast
     grid-template-columns: 1fr;
   }
 }
+
+.pixbee-app-loader {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgb(5 45 28 / 0.76);
+  backdrop-filter: blur(12px);
+  animation: pixbee-loader-fade 260ms var(--ease-out) forwards;
+}
+
+.pixbee-loading-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  min-width: 15rem;
+  padding: 0.9rem 1.1rem;
+  color: #f7fff8;
+  border: 1px solid rgb(151 255 190 / 0.42);
+  border-radius: 999px;
+  background: rgb(9 76 44 / 0.82);
+  box-shadow: 0 16px 34px rgb(0 22 13 / 0.28);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.pixbee-loading-indicator.compact {
+  min-width: 0;
+  padding: 0;
+  color: inherit;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: inherit;
+}
+
+.pixbee-loading-orbit {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: 0 0 auto;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: pixbee-loader-spin 720ms linear infinite;
+}
+
+.pixbee-loading-label {
+  white-space: nowrap;
+}
+
+@keyframes pixbee-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pixbee-loader-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pixbee-app-loader,
+  .pixbee-loading-orbit {
+    animation: none;
+  }
+}

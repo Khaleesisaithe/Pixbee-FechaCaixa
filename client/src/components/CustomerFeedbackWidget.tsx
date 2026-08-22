@@ -14,6 +14,7 @@ import {
   type CustomerFeedbackForm,
 } from "@/lib/customerFeedback";
 import { MessageCircle, Send } from "lucide-react";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 
@@ -225,8 +226,13 @@ export function CustomerFeedbackWidget() {
             type="submit"
             disabled={isSubmitting}
           >
-            <Send size={17} />
-            {isSubmitting ? "Enviando relato..." : "Enviar relato"}
+            {isSubmitting ? (
+              <LoadingIndicator compact label="Enviando relato..." />
+            ) : (
+              <>
+                <Send size={17} /> Enviar relato
+              </>
+            )}
           </Button>
         </form>
       </DialogContent>
