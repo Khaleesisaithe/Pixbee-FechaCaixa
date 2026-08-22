@@ -1,5 +1,4 @@
 <div align="center">
-<img src="./client/public/assets/pixbee-bee-mark.png" alt="Símbolo de abelha do PixBee" width="118" />
 
 # PixBee FechaCaixa
 
