@@ -11,8 +11,8 @@ A árvore final do PixBee FechaCaixa foi revisada após a limpeza de artefatos i
 | `ads.txt` no build | Gerado com fallback seguro, sem ID fictício |
 | Primeiro commit da sincronização | `3d5180870fa6fb3599e9e80cb928c43354b52915` |
 | Commit de registro da validação | `09853d0` |
-| Commits de sincronização registrados | `3d51808`, `09853d0`, `89ef70b`, `bd801bc`, `ae5cbaa`, `251ae3b`, `4e75dfc` |
-| Branch de publicação | `main` — commit atual `4e75dfc` — [ver estado no GitHub](https://github.com/Khaleesisaithe/Pixbee-FechaCaixa/tree/main) |
+| Commits de sincronização registrados | `3d51808`, `09853d0`, `89ef70b`, `bd801bc`, `ae5cbaa`, `251ae3b`, `4e75dfc`, `8718e23` |
+| Branch de publicação | `main` — código corrigido em `4e75dfc`; documentação sincronizada em `8718e23` — [ver estado no GitHub](https://github.com/Khaleesisaithe/Pixbee-FechaCaixa/tree/main) |
 | Repositório | `Khaleesisaithe/Pixbee-FechaCaixa` |
 
 Os commits foram enviados ao GitHub e a branch `main` foi confirmada via API. Os hashes acima registram a sequência de sincronização observada; o link da branch é a fonte de verdade para o estado atual.
