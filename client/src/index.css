@@ -1060,30 +1060,37 @@ html.pixbee-high-contrast
 }
 .welcome-features {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  padding: 22px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 14px;
 }
 .welcome-features > div {
   display: grid;
-  align-content: center;
-  gap: 7px;
+  align-content: start;
+  gap: 8px;
   min-width: 0;
-  padding: 13px;
+  min-height: 112px;
+  padding: 17px 15px;
+  border: 1px solid rgb(255 255 255 / 0.1);
   border-radius: 16px;
   background: rgb(255 255 255 / 0.06);
 }
 .welcome-features svg {
+  width: 23px;
+  height: 23px;
+  margin-bottom: 2px;
   color: var(--aqua);
 }
 .welcome-features strong {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
 }
 .welcome-features p {
   margin: 0;
   color: rgb(255 255 255 / 0.62);
-  font-size: 0.69rem;
-  line-height: 1.4;
+  font-size: 0.73rem;
+  line-height: 1.45;
 }
 
 .flow-panel {
@@ -2499,8 +2506,16 @@ html.pixbee-high-contrast
     min-height: auto;
   }
   .welcome-features > div {
-    grid-template-columns: 29px minmax(0, 1fr);
-    align-items: center;
+    grid-template-columns: 32px minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 4px;
+    align-items: start;
+    min-height: 0;
+    padding: 15px;
+  }
+  .welcome-features svg {
+    grid-row: span 2;
+    margin-top: 2px;
   }
   .welcome-features p {
     grid-column: 2;
