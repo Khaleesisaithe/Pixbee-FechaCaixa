@@ -44,7 +44,7 @@ Depois da primeira publicação, o PixBee recebeu melhorias para tornar a opera�
 | **Turnos de 6, 8 ou 12 horas** | Mantém o cronômetro persistente, avisa o vencimento e permite uma única extensão antes do fechamento obrigatório. |
 | **Herança da composição física** | Permite importar cédulas e moedas da última contagem ao abrir um novo turno, sem redigitar o fundo de caixa. |
 | **Troco corrigível e auditável** | Reabre a entrada, ajusta o valor devolvido conforme a disponibilidade do caixa e recalcula os totais físicos. |
-| **Temas e idiomas** | Oferece temas harmonizados, alto contraste e alternância persistente entre Português e English. |
+| **Temas e idiomas** | Oferece temas harmonizados, alto contraste e alternância persistente entre Português, English e Español. |
 | **Impressão revisada** | Centraliza o comprovante e o relatório histórico no print preview de 80 mm. |
 | **Publicidade responsável** | Mantém o Google AdSense desativado por padrão e, quando ativado, restringe anúncios às áreas públicas. |
 
@@ -129,6 +129,24 @@ Use o formulário de experiência para relatar um problema, sugerir melhorias ou
   <img width="100%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-formulario-contato.png" alt="Formulário de experiência e contato do PixBee" />
   <br />
   <sub>Sobre e contato: canais profissionais, autoria e evolução contínua do PixBee.</sub>
+</p>
+
+### 5. Personalize acessibilidade, idioma e aparência
+
+O menu de preferências rápidas reúne alto contraste, compartilhamento de experiência, escolha persistente de idioma e as três paletas do PixBee. A pessoa operadora pode adaptar a interface sem alterar os registros financeiros do turno.
+
+<p align="center">
+  <img width="100%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-menu-preferencias-temas.webp" alt="Menu de preferências rápidas do PixBee com alto contraste, idiomas e opções de temas" />
+  <br />
+  <sub>Preferências rápidas: acessibilidade, idiomas e seleção persistente de paleta em um único menu.</sub>
+</p>
+
+<p align="center">
+  <img width="31%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-tema-esmeralda.webp" alt="Página inicial do PixBee no tema Esmeralda" />
+  <img width="31%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-tema-indigo-noturno.webp" alt="Página inicial do PixBee no tema Índigo noturno" />
+  <img width="31%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-tema-brisa-clara.webp" alt="Página inicial do PixBee no tema Brisa clara" />
+  <br />
+  <sub>Esmeralda · Índigo noturno · Brisa clara: três temas pensados para contextos de operação e leitura diferentes.</sub>
 </p>
 
 ## Privacidade e operação local
