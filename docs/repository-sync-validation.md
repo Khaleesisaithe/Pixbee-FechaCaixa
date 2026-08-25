@@ -11,6 +11,7 @@ A árvore final do PixBee FechaCaixa foi revisada após a limpeza de artefatos i
 | Primeiro commit da sincronização | `3d5180870fa6fb3599e9e80cb928c43354b52915` |
 | Commit de registro da validação | `09853d0` |
 | Commit de correção da evidência | `89ef70b` |
+| Último commit remoto confirmado | `bd801bc9f691bdfd878a01f3d9e687be09071918` |
 | Branch de publicação | `main` — [ver estado atual no GitHub](https://github.com/Khaleesisaithe/Pixbee-FechaCaixa/tree/main) |
 | Repositório | `Khaleesisaithe/Pixbee-FechaCaixa` |
 
