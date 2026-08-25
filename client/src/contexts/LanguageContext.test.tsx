@@ -12,6 +12,7 @@ function Probe() {
       <span data-testid="locale">{locale}</span>
       <span>{t("welcome.start")}</span>
       <button type="button" onClick={() => setLocale("en")}>EN</button>
+      <button type="button" onClick={() => setLocale("es")}>ES</button>
     </div>
   );
 }
@@ -35,5 +36,19 @@ describe("preferência de idioma", () => {
     expect(screen.getByTestId("locale").textContent).toBe("en");
     expect(screen.getByText("Start count")).toBeTruthy();
     expect(window.localStorage.getItem("pixbee-locale")).toBe("en");
+  });
+
+  it("alterna para espanhol e persiste a escolha no navegador", async () => {
+    const user = userEvent.setup();
+    render(
+      <LanguageProvider>
+        <Probe />
+      </LanguageProvider>
+    );
+
+    await user.click(screen.getByRole("button", { name: "ES" }));
+    expect(screen.getByTestId("locale").textContent).toBe("es");
+    expect(screen.getByText("Iniciar conteo")).toBeTruthy();
+    expect(window.localStorage.getItem("pixbee-locale")).toBe("es");
   });
 });

@@ -43,7 +43,15 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
         "Validação do fechamento": t("page.validation"),
         "Histórico de turnos": t("page.history"),
       } as Record<string, string>)[title] ?? title
-    : title;
+    : locale === "es"
+      ? ({
+          "Sistema de fechamento": "Sistema de cierre",
+          "Abertura de contagem": t("page.opening"),
+          "Contagem em andamento": t("page.count"),
+          "Validação do fechamento": t("page.validation"),
+          "Histórico de turnos": t("page.history"),
+        } as Record<string, string>)[title] ?? title
+      : title;
   const isCountRoute = ["/abertura", "/contagem", "/validacao"].includes(
     location
   );
@@ -52,7 +60,7 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
 
   function startNewCount() {
     if (session.closureRequired && !session.validatedAt) {
-      toast.error(locale === "en" ? "Validate the current closing before starting a new count." : "Valide o fechamento atual antes de iniciar uma nova contagem.");
+      toast.error(locale === "en" ? "Validate the current closing before starting a new count." : locale === "es" ? "Valida el cierre actual antes de iniciar un nuevo conteo." : "Valide o fechamento atual antes de iniciar uma nova contagem.");
       navigate("/validacao");
       return;
     }
@@ -63,10 +71,9 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
   function toggleAccessibility() {
     toggleHighContrast();
     toast.success(
-              highContrast
-        ? locale === "en" ? "High contrast mode disabled." : "Modo de alto contraste desativado."
-        : locale === "en" ? "High contrast mode enabled." : "Modo de alto contraste ativado."
-
+      highContrast
+        ? locale === "en" ? "High contrast mode disabled." : locale === "es" ? "Modo de alto contraste desactivado." : "Modo de alto contraste desativado."
+        : locale === "en" ? "High contrast mode enabled." : locale === "es" ? "Modo de alto contraste activado." : "Modo de alto contraste ativado."
     );
   }
 
@@ -226,6 +233,7 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
             <div className="quick-tools-language" role="group" aria-label={t("tools.language")}>
               <button type="button" className={locale === "pt-BR" ? "is-selected" : ""} onClick={() => setLocale("pt-BR")} aria-pressed={locale === "pt-BR"}>PT-BR</button>
               <button type="button" className={locale === "en" ? "is-selected" : ""} onClick={() => setLocale("en")} aria-pressed={locale === "en"}>EN</button>
+              <button type="button" className={locale === "es" ? "is-selected" : ""} onClick={() => setLocale("es")} aria-pressed={locale === "es"}>ES</button>
             </div>
             {PIXBEE_THEMES.map(option => (
               <button

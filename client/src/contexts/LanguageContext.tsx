@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-export type Locale = "pt-BR" | "en";
+export type Locale = "pt-BR" | "en" | "es";
 
 export const PIXBEE_LANGUAGES: Array<{ id: Locale; label: string; description: string }> = [
   { id: "pt-BR", label: "Português", description: "Idioma padrão do PixBee." },
   { id: "en", label: "English", description: "English interface for daily operations." },
+  { id: "es", label: "Español", description: "Interfaz en español para las operaciones diarias." },
 ];
 
 const messages = {
@@ -90,6 +91,47 @@ const messages = {
     "opening.copy": "These details form the basis of your final validation.",
     "history.start": "Start count",
   },
+  es: {
+    "nav.home": "Inicio",
+    "nav.newCount": "Nuevo conteo",
+    "nav.history": "Historial",
+    "nav.privacy": "Privacidad",
+    "nav.about": "Sobre PixBee",
+    "tools.title": "Preferencias rápidas",
+    "tools.subtitle": "Ajustes guardados en este navegador",
+    "tools.contrast": "Alto contraste",
+    "tools.contrastOn": "Alto contraste activo",
+    "tools.feedback": "Compartir experiencia",
+    "tools.theme": "Elige una paleta",
+    "tools.language": "Idioma de la interfaz",
+    "tools.open": "Abrir preferencias rápidas",
+    "tools.close": "Cerrar preferencias rápidas",
+    "page.system": "Sistema de cierre",
+    "page.opening": "Apertura del conteo",
+    "page.count": "Conteo en curso",
+    "page.validation": "Validación del cierre",
+    "page.history": "Historial de turnos",
+    "welcome.kicker": "Control local y seguro",
+    "welcome.title": "Cierra la caja con claridad, control y menos retrabajo.",
+    "welcome.copy": "Abre el turno, informa el fondo en billetes y monedas, registra entradas y revisa el resultado antes de validar.",
+    "welcome.start": "Iniciar conteo",
+    "welcome.local": "Datos locales en el navegador; historial disponible hasta tres días.",
+    "welcome.flow": "Cómo PixBee organiza tu cierre",
+    "welcome.flowCopy": "1. Identifica el turno y elige las modalidades. 2. Registra entradas, cambio, suministros y retiros. 3. Cuenta el efectivo y revisa los totales. 4. Valida, imprime y abre el siguiente conteo.",
+    "welcome.pillCash": "Fondo, billetes y monedas",
+    "welcome.pillDigital": "PIX, tarjetas y vales",
+    "welcome.pillAudit": "Historial y auditoría",
+    "welcome.featureCount": "Billetes, monedas y entradas actualizan los subtotales al instante.",
+    "welcome.featureTimer": "Elige 6, 8 o 12 horas; el cronómetro continúa entre pantallas.",
+    "welcome.featureValidation": "Compara lo esperado y lo contado, corrige el cambio e imprime en 80 mm",
+    "count.step": "Etapa 02",
+    "count.title": "Registra los valores del turno.",
+    "count.copy": "Los valores esperados se comparan con lo que realmente se contó.",
+    "opening.step": "Etapa 01",
+    "opening.title": "Identifica la caja y elige qué vas a conciliar.",
+    "opening.copy": "Estos datos forman la base de tu validación final.",
+    "history.start": "Iniciar conteo",
+  },
 } as const;
 
 type TranslationKey = keyof (typeof messages)["pt-BR"];
@@ -107,9 +149,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const previewLocale = typeof window === "undefined"
       ? null
       : new URLSearchParams(window.location.search).get("lang");
-    if (previewLocale === "en") return "en";
+    if (previewLocale === "en" || previewLocale === "es") return previewLocale;
     const stored = typeof window === "undefined" ? null : localStorage.getItem("pixbee-locale");
-    return stored === "en" ? "en" : "pt-BR";
+    return stored === "en" || stored === "es" ? stored : "pt-BR";
   });
 
   useEffect(() => {

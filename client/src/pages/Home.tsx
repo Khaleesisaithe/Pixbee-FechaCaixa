@@ -746,19 +746,19 @@ function WelcomePage() {
         <article className="glass-panel welcome-features">
           <div>
             <WalletCards size={24} />
-                          <strong>{locale === "en" ? "Assisted count" : "Contagem assistida"}</strong>
+                          <strong>{locale === "en" ? "Assisted count" : locale === "es" ? "Conteo asistido" : "Contagem assistida"}</strong>
               <p>{t("welcome.featureCount")}</p>
 
           </div>
           <div>
             <Clock3 size={24} />
-                          <strong>{locale === "en" ? "Shift timer" : "Tempo do turno"}</strong>
+                          <strong>{locale === "en" ? "Shift timer" : locale === "es" ? "Cronómetro del turno" : "Tempo do turno"}</strong>
               <p>{t("welcome.featureTimer")}</p>
 
           </div>
           <div>
             <ReceiptText size={24} />
-                          <strong>{locale === "en" ? "Final validation" : "Validação final"}</strong>
+                          <strong>{locale === "en" ? "Final validation" : locale === "es" ? "Validación final" : "Validação final"}</strong>
               <p>{t("welcome.featureValidation")}</p>
 
           </div>
