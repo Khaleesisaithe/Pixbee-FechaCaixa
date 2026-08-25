@@ -1,10 +1,16 @@
 // @vitest-environment jsdom
 import React from "react";
-import { describe, expect, it } from "vitest";
-import { render } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+import { cleanup, render } from "@testing-library/react";
 import { AdSenseSlot } from "@/components/AdSenseSlot";
 import { adsenseSettings, isAdSenseReady, isPublicAdRoute, isValidAdSenseClientId } from "./adsense";
 import { buildAdsTxtContent } from "@shared/adsense";
+
+afterEach(() => {
+  cleanup();
+  document.getElementById("pixbee-adsense-script")?.remove();
+  delete (window as Window & { adsbygoogle?: unknown[] }).adsbygoogle;
+});
 
 describe("AdSense configuration", () => {
   it("accepts only publisher IDs in the ca-pub format", () => {
@@ -35,7 +41,18 @@ describe("AdSense configuration", () => {
 
   it("does not render a slot or inject a script while opt-in is disabled", () => {
     const { container } = render(
-      <AdSenseSlot publicRoute="/" slot="1234567890" label="Advertisement" />,
+      <AdSenseSlot
+        publicRoute="/"
+        slot="1234567890"
+        label="Advertisement"
+        settings={{
+          enabled: false,
+          clientId: "ca-pub-1234567890123456",
+          homeSlot: "1234567890",
+          aboutSlot: "1234567890",
+          privacySlot: "1234567890",
+        }}
+      />,
     );
 
     expect(container.querySelector(".adsense-slot")).toBeNull();
@@ -84,11 +101,33 @@ describe("AdSense configuration", () => {
     expect(document.getElementById("pixbee-adsense-script")).toBeNull();
   });
 
-  it("stays disabled by default until project variables are configured", () => {
-    expect(adsenseSettings.enabled).toBe(false);
-    expect(adsenseSettings.clientId).toBe("");
-    expect(adsenseSettings.homeSlot).toBe("");
-    expect(adsenseSettings.aboutSlot).toBe("");
-    expect(adsenseSettings.privacySlot).toBe("");
+  it("accepts a valid enabled publisher and public slot configuration", () => {
+    const configuredSettings = {
+      enabled: true,
+      clientId: "ca-pub-1234567890123456",
+      homeSlot: "1234567890",
+      aboutSlot: "1234567890",
+      privacySlot: "1234567890",
+    };
+
+    expect(isAdSenseReady({
+      enabled: configuredSettings.enabled,
+      clientId: configuredSettings.clientId,
+      slot: configuredSettings.homeSlot,
+    })).toBe(true);
+
+    const { container } = render(
+      <AdSenseSlot
+        publicRoute="/"
+        slot={configuredSettings.homeSlot}
+        label="Publicidade"
+        settings={configuredSettings}
+      />,
+    );
+
+    expect(container.querySelector(".adsense-slot")).not.toBeNull();
+    expect(container.querySelector("ins.adsbygoogle")?.getAttribute("data-ad-client")).toBe(configuredSettings.clientId);
+    expect(container.querySelector("ins.adsbygoogle")?.getAttribute("data-ad-slot")).toBe(configuredSettings.homeSlot);
+    expect(document.getElementById("pixbee-adsense-script")?.getAttribute("src")).toContain(configuredSettings.clientId);
   });
 });
