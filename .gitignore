@@ -16,15 +16,6 @@ build/
 .env.*
 !.env.example
 
-# Certificates, signing keys and local credentials
-*.pem
-*.key
-*.p12
-*.pfx
-*.crt
-*.cer
-*.keystore
-
 # IDE and editor files
 .vscode/
 .idea/
@@ -124,19 +115,21 @@ temp/
 client/public/__manus__/version.json
 .project-config.json
 
-# Ambiente de desenvolvimento e telemetria local
+# Ambiente local, telemetria e previews
 .manus-logs/
 client/public/__manus__/
 *.local
 
-# Arquivos de entrega gerados localmente
+# Artefatos de entrega e captura
 release/
 downloads/
+screenshots/
 
-# Hosting providers and internal planning
+# Configurações de hospedagem locais
 .vercel/
 .netlify/
+
+# Planejamento interno do projeto
 todo.md
 template.json
 ideas.md
-screenshots/

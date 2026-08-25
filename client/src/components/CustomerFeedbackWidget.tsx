@@ -16,8 +16,9 @@ import {
 import { isFeedbackPreviewEnabled } from "@/lib/feedbackPreview";
 import { MessageCircle, Send } from "lucide-react";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
-import { type FormEvent, useState } from "react";
+import React, { type FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const initialForm: CustomerFeedbackForm = {
   email: "",
@@ -32,7 +33,8 @@ const initialForm: CustomerFeedbackForm = {
 };
 
 /** Canal público de relatos encaminhado pelo formulário hospedado da autora. */
-export function CustomerFeedbackWidget() {
+export function CustomerFeedbackWidget({ showTrigger = true }: { showTrigger?: boolean }) {
+  const { locale } = useLanguage();
   const [open, setOpen] = useState(() =>
     isFeedbackPreviewEnabled(
       typeof window === "undefined" ? "" : window.location.search,
@@ -41,6 +43,13 @@ export function CustomerFeedbackWidget() {
   );
   const [form, setForm] = useState<CustomerFeedbackForm>(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const openFromQuickTools = () => setOpen(true);
+    window.addEventListener("pixbee:open-feedback", openFromQuickTools);
+    return () =>
+      window.removeEventListener("pixbee:open-feedback", openFromQuickTools);
+  }, []);
 
   function update<K extends keyof CustomerFeedbackForm>(
     field: K,
@@ -52,7 +61,7 @@ export function CustomerFeedbackWidget() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!form.consent) {
-      toast.error("Autorize o envio para compartilhar seu relato.");
+      toast.error(locale === "en" ? "Authorize submission to share your report." : "Autorize o envio para compartilhar seu relato.");
       return;
     }
 
@@ -73,14 +82,14 @@ export function CustomerFeedbackWidget() {
         body: JSON.stringify(buildFormspreePayload(form)),
       });
 
-      if (!response.ok) throw new Error("Formspree recusou o relato.");
+      if (!response.ok) throw new Error(locale === "en" ? "Formspree rejected the report." : "Formspree recusou o relato.");
 
       setForm(initialForm);
       setOpen(false);
-      toast.success("Relato enviado. Obrigada por ajudar a melhorar o PixBee.");
+      toast.success(locale === "en" ? "Report sent. Thank you for helping improve PixBee." : "Relato enviado. Obrigada por ajudar a melhorar o PixBee.");
     } catch {
       toast.error(
-        "Não foi possível enviar agora. Confira os campos e tente novamente."
+        locale === "en" ? "It was not possible to send this now. Check the fields and try again." : "Não foi possível enviar agora. Confira os campos e tente novamente."
       );
     } finally {
       setIsSubmitting(false);
@@ -89,29 +98,28 @@ export function CustomerFeedbackWidget() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      {showTrigger && <DialogTrigger asChild>
         <button
           className="feedback-fab"
           type="button"
-          aria-label="Enviar relato de experiência"
-          title="Experiência do cliente"
+          aria-label={locale === "en" ? "Send customer feedback" : "Enviar relato de experiência"}
+          title={locale === "en" ? "Customer feedback" : "Experiência do cliente"}
         >
           <MessageCircle size={21} />
-          <span>Experiência do cliente</span>
+          <span>{locale === "en" ? "Customer feedback" : "Experiência do cliente"}</span>
         </button>
-      </DialogTrigger>
+      </DialogTrigger>}
       <DialogContent className="feedback-dialog">
         <DialogHeader>
-          <DialogTitle>Conte sua experiência</DialogTitle>
+          <DialogTitle>{locale === "en" ? "Share your experience" : "Conte sua experiência"}</DialogTitle>
           <DialogDescription>
-            Encontrou um problema ou tem uma ideia? Seu relato ajuda a tornar o
-            PixBee mais útil no dia a dia de caixa.
+            {locale === "en" ? "Found a problem or have an idea? Your report helps make PixBee more useful for daily cash operations." : "Encontrou um problema ou tem uma ideia? Seu relato ajuda a tornar o PixBee mais útil no dia a dia de caixa."}
           </DialogDescription>
         </DialogHeader>
         <form className="feedback-form" onSubmit={handleSubmit}>
           <div className="feedback-grid">
             <label>
-              <span>Seu e-mail</span>
+              <span>{locale === "en" ? "Your email" : "Seu e-mail"}</span>
               <input
                 type="email"
                 required
@@ -122,7 +130,7 @@ export function CustomerFeedbackWidget() {
               />
             </label>
             <label>
-              <span>Você é</span>
+              <span>{locale === "en" ? "You are" : "Você é"}</span>
               <select
                 value={form.profile}
                 onChange={event =>
@@ -132,28 +140,28 @@ export function CustomerFeedbackWidget() {
                   )
                 }
               >
-                <option value="empresa">Empresa</option>
-                <option value="operador">Operador(a) de caixa</option>
-                <option value="autonomo">Profissional autônomo(a)</option>
-                <option value="outro">Outro</option>
+                <option value="empresa">{locale === "en" ? "Company" : "Empresa"}</option>
+                <option value="operador">{locale === "en" ? "Cashier" : "Operador(a) de caixa"}</option>
+                <option value="autonomo">{locale === "en" ? "Self-employed professional" : "Profissional autônomo(a)"}</option>
+                <option value="outro">{locale === "en" ? "Other" : "Outro"}</option>
               </select>
             </label>
           </div>
           <div className="feedback-grid">
             <label>
               <span>
-                Empresa <small>opcional</small>
+                {locale === "en" ? "Company" : "Empresa"} <small>{locale === "en" ? "optional" : "opcional"}</small>
               </span>
               <input
                 value={form.company}
                 maxLength={120}
-                placeholder="Nome do negócio"
+                placeholder={locale === "en" ? "Business name" : "Nome do negócio"}
                 onChange={event => update("company", event.target.value)}
               />
             </label>
             <label>
               <span>
-                CNPJ <small>opcional</small>
+                CNPJ <small>{locale === "en" ? "optional" : "opcional"}</small>
               </span>
               <input
                 value={form.cnpj}
@@ -165,7 +173,7 @@ export function CustomerFeedbackWidget() {
             </label>
           </div>
           <label>
-            <span>Tipo de relato</span>
+            <span>{locale === "en" ? "Report type" : "Tipo de relato"}</span>
             <select
               value={form.category}
               onChange={event =>
@@ -175,31 +183,31 @@ export function CustomerFeedbackWidget() {
                 )
               }
             >
-              <option value="problema">Relatar um problema</option>
-              <option value="sugestao">Enviar uma sugestão</option>
-              <option value="melhoria">Sugerir uma melhoria</option>
-              <option value="outro">Outro assunto</option>
+              <option value="problema">{locale === "en" ? "Report a problem" : "Relatar um problema"}</option>
+              <option value="sugestao">{locale === "en" ? "Send a suggestion" : "Enviar uma sugestão"}</option>
+              <option value="melhoria">{locale === "en" ? "Suggest an improvement" : "Sugerir uma melhoria"}</option>
+              <option value="outro">{locale === "en" ? "Other topic" : "Outro assunto"}</option>
             </select>
           </label>
           <label>
-            <span>Conte o que aconteceu</span>
+            <span>{locale === "en" ? "Tell us what happened" : "Conte o que aconteceu"}</span>
             <textarea
               required
               minLength={12}
               maxLength={2400}
               value={form.report}
-              placeholder="Descreva o contexto, o que esperava que acontecesse e o que ocorreu."
+              placeholder={locale === "en" ? "Describe the context, what you expected to happen, and what happened." : "Descreva o contexto, o que esperava que acontecesse e o que ocorreu."}
               onChange={event => update("report", event.target.value)}
             />
           </label>
           <label>
             <span>
-              Como o PixBee pode melhorar? <small>opcional</small>
+              {locale === "en" ? "How can PixBee improve?" : "Como o PixBee pode melhorar?"} <small>{locale === "en" ? "optional" : "opcional"}</small>
             </span>
             <textarea
               maxLength={1200}
               value={form.suggestion}
-              placeholder="Compartilhe sua ideia ou sugestão."
+              placeholder={locale === "en" ? "Share your idea or suggestion." : "Compartilhe sua ideia ou sugestão."}
               onChange={event => update("suggestion", event.target.value)}
             />
           </label>
@@ -210,11 +218,11 @@ export function CustomerFeedbackWidget() {
               onChange={event => update("consent", event.target.checked)}
             />
             <span>
-              Autorizo o envio destes dados para contato e melhoria do PixBee.
+              {locale === "en" ? "I authorize sending this data so the creator can contact me and improve PixBee." : "Autorizo o envio destes dados para contato e melhoria do PixBee."}
             </span>
           </label>
           <label className="feedback-honeypot" aria-hidden="true">
-            Site
+            {locale === "en" ? "Website" : "Site"}
             <input
               tabIndex={-1}
               autoComplete="off"
@@ -223,9 +231,7 @@ export function CustomerFeedbackWidget() {
             />
           </label>
           <p className="feedback-privacy">
-            Os dados deste formulário são usados somente para responder ao seu
-            relato e aprimorar o sistema. Não envie senhas ou informações de
-            pagamento.
+            {locale === "en" ? "Data from this form is used only to respond to your report and improve the system. Do not send passwords or payment information." : "Os dados deste formulário são usados somente para responder ao seu relato e aprimorar o sistema. Não envie senhas ou informações de pagamento."}
           </p>
           <Button
             className="pixbee-primary-button feedback-submit"
@@ -233,10 +239,10 @@ export function CustomerFeedbackWidget() {
             disabled={isSubmitting}
           >
             {isSubmitting ? (
-              <LoadingIndicator compact label="Enviando relato..." />
+              <LoadingIndicator compact label={locale === "en" ? "Sending report..." : "Enviando relato..."} />
             ) : (
               <>
-                <Send size={17} /> Enviar relato
+                <Send size={17} /> {locale === "en" ? "Send report" : "Enviar relato"}
               </>
             )}
           </Button>

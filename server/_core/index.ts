@@ -3,7 +3,7 @@ import express from "express";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { isOAuthConfigured } from "./oauthConfig";
+import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
@@ -35,13 +35,7 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
-
-  if (isOAuthConfigured(process.env)) {
-    const { registerOAuthRoutes } = await import("./oauth");
-    registerOAuthRoutes(app);
-  } else {
-    console.info("[OAuth] Disabled: configure OAuth variables only when login is required.");
-  }
+  registerOAuthRoutes(app);
   // tRPC API
   app.use(
     "/api/trpc",

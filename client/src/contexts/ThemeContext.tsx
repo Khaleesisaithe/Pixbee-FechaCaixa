@@ -1,10 +1,28 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+export type Theme = "emerald" | "midnight" | "daylight";
+
+export const PIXBEE_THEMES: Array<{ id: Theme; label: string; description: string }> = [
+  {
+    id: "emerald",
+    label: "Esmeralda",
+    description: "Verde operacional com acentos turquesa.",
+  },
+  {
+    id: "midnight",
+    label: "Índigo noturno",
+    description: "Azul profundo com violeta de alta concentração.",
+  },
+  {
+    id: "daylight",
+    label: "Brisa clara",
+    description: "Fundo claro, azul-marinho e detalhes em coral.",
+  },
+];
 
 interface ThemeContextType {
   theme: Theme;
-  toggleTheme?: () => void;
+  setTheme: (theme: Theme) => void;
   switchable: boolean;
 }
 
@@ -18,38 +36,32 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({
   children,
-  defaultTheme = "light",
-  switchable = false,
+  defaultTheme = "emerald",
+  switchable = true,
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(() => {
-    if (switchable) {
-      const stored = localStorage.getItem("theme");
-      return (stored as Theme) || defaultTheme;
+    const previewTheme = new URLSearchParams(window.location.search).get("theme");
+    if (PIXBEE_THEMES.some(item => item.id === previewTheme)) {
+      return previewTheme as Theme;
     }
-    return defaultTheme;
+    const stored = localStorage.getItem("pixbee-theme");
+    if (stored === "copper") return "daylight";
+    return PIXBEE_THEMES.some(item => item.id === stored)
+      ? (stored as Theme)
+      : defaultTheme;
   });
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
+    root.dataset.pixbeeTheme = theme;
 
     if (switchable) {
-      localStorage.setItem("theme", theme);
+      localStorage.setItem("pixbee-theme", theme);
     }
   }, [theme, switchable]);
 
-  const toggleTheme = switchable
-    ? () => {
-        setTheme(prev => (prev === "light" ? "dark" : "light"));
-      }
-    : undefined;
-
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, switchable }}>
+    <ThemeContext.Provider value={{ theme, setTheme, switchable }}>
       {children}
     </ThemeContext.Provider>
   );

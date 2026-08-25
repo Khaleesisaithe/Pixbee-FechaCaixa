@@ -25,19 +25,6 @@ pnpm-lock.yaml
 
 # Environment files
 .env*
-.project-config.json
-.manus-logs/
-client/public/__manus__/
-
-# Hosting providers and internal planning
-.vercel/
-.netlify/
-todo.md
-template.json
-ideas.md
-release/
-downloads/
-screenshots/
 
 # IDE files
 .vscode/

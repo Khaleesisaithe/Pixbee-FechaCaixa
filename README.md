@@ -136,6 +136,14 @@ O PixBee é um projeto independente em evolução. Uma contribuição voluntári
   <sub>Chave Pix (CNPJ) · Apoio voluntário para domínio, manutenção e crescimento do projeto.</sub>
 </p>
 
+## Monetização responsável
+
+A preparação para Google AdSense permanece desativada por padrão. Quando o domínio estiver aprovado e o ID do editor for configurado, os anúncios poderão aparecer somente em áreas públicas e institucionais, nunca durante abertura, contagem, validação ou histórico do caixa. O arquivo `ads.txt` é gerado no build a partir da configuração real do editor, sem publicar identificadores fictícios.
+
+<p align="center">
+  <a href="./ADSENSE.md">Ver instruções de configuração do AdSense</a>
+</p>
+
 ## Autoria
 
 O PixBee foi idealizado por **Khaleesi Saithe**, em transição de operações e varejo para Ciência de Dados, cursando Estácio de Sá. O sistema nasceu de necessidades reais de atendimento e conferência de caixa e foi desenvolvido com assistência de ferramentas de IA, mantendo as decisões de produto e regras de negócio sob responsabilidade da autora.

@@ -1,7 +1,10 @@
 /** Design: PixBee original — rotas diretas entre início, abertura, contagem e validação. */
+import React from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CashSessionProvider } from "@/contexts/CashSessionContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import NotFound from "@/pages/NotFound";
 import { useEffect, useState } from "react";
@@ -38,15 +41,19 @@ function App() {
   return (
     <ErrorBoundary>
       <CashSessionProvider>
-        <TooltipProvider>
-          <Toaster position="top-center" richColors />
-          <Router />
-          {isBooting || isLoaderPreview ? (
-            <div className="pixbee-app-loader" aria-label="Carregando PixBee">
-              <LoadingIndicator label="Preparando seu fechamento" />
-            </div>
-          ) : null}
-        </TooltipProvider>
+        <ThemeProvider defaultTheme="emerald" switchable>
+          <LanguageProvider>
+            <TooltipProvider>
+              <Toaster position="top-center" richColors />
+              <Router />
+              {isBooting || isLoaderPreview ? (
+                <div className="pixbee-app-loader" aria-label="Carregando PixBee">
+                  <LoadingIndicator label="Preparando seu fechamento" />
+                </div>
+              ) : null}
+            </TooltipProvider>
+          </LanguageProvider>
+        </ThemeProvider>
       </CashSessionProvider>
     </ErrorBoundary>
   );
