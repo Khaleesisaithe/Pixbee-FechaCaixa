@@ -730,21 +730,16 @@ function WelcomePage() {
             <ClipboardCheck size={26} />
           </div>
           <h3>{t("welcome.flow")}</h3>
-          <p>
-            {locale === "en"
-              ? "First identify the shift. Then choose the payment methods, count with the timer, and validate the result."
-              : "Primeiro identifique o turno. Depois selecione os recebimentos, faça a contagem com cronômetro e valide o resultado."}
-          </p>
+          <p>{t("welcome.flowCopy")}</p>
           <div className="feature-pills">
-                          <span>
-                <Banknote size={15} /> {locale === "en" ? "Notes and coins" : "Cédulas e moedas"}
-              </span>
-
             <span>
-              <Smartphone size={15} /> {locale === "en" ? "PIX and cards" : "PIX e cartões"}
+              <Banknote size={15} /> {t("welcome.pillCash")}
             </span>
             <span>
-              <CheckCircle2 size={15} /> {locale === "en" ? "Reconciliation" : "Conciliação"}
+              <Smartphone size={15} /> {t("welcome.pillDigital")}
+            </span>
+            <span>
+              <CheckCircle2 size={15} /> {t("welcome.pillAudit")}
             </span>
           </div>
         </article>
@@ -752,19 +747,19 @@ function WelcomePage() {
           <div>
             <WalletCards size={24} />
                           <strong>{locale === "en" ? "Assisted count" : "Contagem assistida"}</strong>
-              <p>{locale === "en" ? "Subtotals updated instantly." : "Subtotais atualizados na hora."}</p>
+              <p>{t("welcome.featureCount")}</p>
 
           </div>
           <div>
             <Clock3 size={24} />
                           <strong>{locale === "en" ? "Shift timer" : "Tempo do turno"}</strong>
-              <p>{locale === "en" ? "Clock and timer during counting." : "Relógio e cronômetro na contagem."}</p>
+              <p>{t("welcome.featureTimer")}</p>
 
           </div>
           <div>
             <ReceiptText size={24} />
                           <strong>{locale === "en" ? "Final validation" : "Validação final"}</strong>
-              <p>{locale === "en" ? "Overall and method-level differences." : "Diferença geral e por modalidade."}</p>
+              <p>{t("welcome.featureValidation")}</p>
 
           </div>
         </article>
