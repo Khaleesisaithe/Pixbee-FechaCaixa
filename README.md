@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/client/public/assets/pixbee-bee-mark.png" width="104" alt="Símbolo PixBee" />
+  <img src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/client/public/assets/pixbee-bee-mark.webp" width="104" alt="Símbolo PixBee" />
 </p>
 
 <h1 align="center">PixBee FechaCaixa</h1>

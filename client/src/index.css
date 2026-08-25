@@ -72,7 +72,7 @@ body {
   color: var(--foreground);
   background:
     linear-gradient(rgb(0 0 0 / 0.31), rgb(0 0 0 / 0.31)),
-    url("/assets/pixbee-fundo-original.jpg") center / cover
+    url("/assets/pixbee-fundo-original.webp") center / cover
       fixed;
   font-family: "Poppins", Arial, sans-serif;
 }
@@ -343,7 +343,7 @@ html.pixbee-high-contrast
   display: grid;
   flex: 0 0 auto;
   place-items: center;
-  background: url("/assets/pixbee-bee-mark.png") center /
+  background: url("/assets/pixbee-bee-mark.webp") center /
     contain no-repeat;
   filter: drop-shadow(0 5px 10px rgb(0 0 0 / 0.22));
 }
@@ -813,7 +813,7 @@ html.pixbee-high-contrast
   display: inline-block;
   flex: 0 0 auto;
   content: "";
-  background: url("/assets/pixbee-bee-mark.png") center /
+  background: url("/assets/pixbee-bee-mark.webp") center /
     contain no-repeat;
 }
 .topbar-title p {

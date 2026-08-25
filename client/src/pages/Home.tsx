@@ -3590,7 +3590,7 @@ function CreatorAboutPage() {
         <article className="glass-panel creator-profile">
           <div className="creator-photo-frame">
             <img
-              src="/assets/khaleesi-saithe-profile.png"
+              src="/assets/khaleesi-saithe-profile.webp"
               alt={locale === "en" ? "Khaleesi Saithe, creator of PixBee FechaCaixa" : "Khaleesi Saithe, criadora do PixBee FechaCaixa"}
             />
           </div>
