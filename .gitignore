@@ -124,6 +124,8 @@ client/public/__manus__/
 release/
 downloads/
 screenshots/
+!docs/screenshots/
+!docs/screenshots/*.png
 
 # Configurações de hospedagem locais
 .vercel/

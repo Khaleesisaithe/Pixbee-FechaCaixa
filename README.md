@@ -35,6 +35,19 @@ O PixBee organiza a abertura do turno, o registro de movimentações, a contagem
 | **Conciliação** | Mostra sobra ou falta por modalidade, sem impedir o fechamento. |
 | **Comprovantes** | Prepara impressão Epson em bobina de 80 mm e relatório PDF. |
 
+## Atualizações recentes
+
+Depois da primeira publicação, o PixBee recebeu melhorias para tornar a operação mais segura, clara e preparada para diferentes rotinas de caixa.
+
+| Atualização | Resultado na prática |
+| --- | --- |
+| **Turnos de 6, 8 ou 12 horas** | Mantém o cronômetro persistente, avisa o vencimento e permite uma única extensão antes do fechamento obrigatório. |
+| **Herança da composição física** | Permite importar cédulas e moedas da última contagem ao abrir um novo turno, sem redigitar o fundo de caixa. |
+| **Troco corrigível e auditável** | Reabre a entrada, ajusta o valor devolvido conforme a disponibilidade do caixa e recalcula os totais físicos. |
+| **Temas e idiomas** | Oferece temas harmonizados, alto contraste e alternância persistente entre Português e English. |
+| **Impressão revisada** | Centraliza o comprovante e o relatório histórico no print preview de 80 mm. |
+| **Publicidade responsável** | Mantém o Google AdSense desativado por padrão e, quando ativado, restringe anúncios às áreas públicas. |
+
 ## Tecnologias e ferramentas utilizadas
 
 <p align="center">
@@ -85,7 +98,7 @@ Na etapa de contagem, informe o que entrou no caixa e registre cada valor recebi
 <p align="center">
   <img width="100%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-contagem.png" alt="Tela de contagem do PixBee com entradas acumuladas em espécie" />
   <br />
-  <sub>Contagem em andamento: fundo inicial, entradas acumuladas, dinheiro físico e resumo do turno.</sub>
+  <sub>Contagem em andamento: cronômetro do turno, fundo herdado, entradas acumuladas, dinheiro físico e resumo em tempo real.</sub>
 </p>
 
 ### 2. Valide o fechamento e imprima o comprovante
@@ -95,7 +108,7 @@ Depois de conferir os valores, valide o fechamento. O PixBee mostra a diferença
 <p align="center">
   <img width="100%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-validacao-impressao.png" alt="Tela de validação do PixBee com botão de imprimir comprovante" />
   <br />
-  <sub>Validação do fechamento: conciliação, divergência e acesso ao comprovante térmico.</sub>
+  <sub>Validação do fechamento: conciliação, divergência e comprovante térmico centralizado para 80 mm.</sub>
 </p>
 
 ### 3. Entenda como seus dados são tratados
@@ -105,7 +118,7 @@ Os dados do turno ficam no navegador utilizado pela pessoa operadora. A página 
 <p align="center">
   <img width="100%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-privacidade-interativa.png" alt="Tela de privacidade e direitos do PixBee" />
   <br />
-  <sub>Privacidade e direitos: informações claras sobre armazenamento local e operação responsável.</sub>
+  <sub>Privacidade e direitos: armazenamento local, retenção de três dias e operação responsável.</sub>
 </p>
 
 ### 4. Entre em contato, relate um problema ou envie uma sugestão
@@ -115,7 +128,7 @@ Use o formulário de experiência para relatar um problema, sugerir melhorias ou
 <p align="center">
   <img width="100%" src="https://raw.githubusercontent.com/Khaleesisaithe/Pixbee-FechaCaixa/main/docs/screenshots/pixbee-formulario-contato.png" alt="Formulário de experiência e contato do PixBee" />
   <br />
-  <sub>Canal de contato: problemas, sugestões e melhorias para evolução contínua do PixBee.</sub>
+  <sub>Sobre e contato: canais profissionais, autoria e evolução contínua do PixBee.</sub>
 </p>
 
 ## Privacidade e operação local
