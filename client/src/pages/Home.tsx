@@ -171,6 +171,17 @@ const ENGLISH_METHOD_INFO: Record<MethodId, { title: string; description: string
   withdrawal: { title: "Withdrawal", description: "Cash removed during the shift." },
   supply: { title: "Supply", description: "Cash added to the drawer." },
 };
+const SPANISH_METHOD_INFO: Record<MethodId, { title: string; description: string }> = {
+  cash: { title: "Billetes y monedas", description: "Cuenta el efectivo físico de la caja." },
+  pix: { title: "PIX", description: "Confirma el total recibido por PIX." },
+  debit: { title: "Tarjeta de débito", description: "Informa el total de la operadora." },
+  credit: { title: "Tarjeta de crédito", description: "Informa el total de la operadora." },
+  voucher: { title: "Vales y vouchers", description: "Registra convenios y beneficios." },
+  withdrawal: { title: "Retiro", description: "Valor retirado durante el turno." },
+  supply: { title: "Ingreso", description: "Valor agregado a la caja." },
+};
+const localize = (locale: Locale, english: string, spanish: string, portuguese: string) =>
+  locale === "en" ? english : locale === "es" ? spanish : portuguese;
 const currency = new Intl.NumberFormat("pt-BR", {
   style: "currency",
   currency: "BRL",
@@ -277,43 +288,49 @@ const getShiftLabel = (
   >,
   locale: Locale = "pt-BR"
 ) =>
-  `${new Intl.DateTimeFormat(locale === "en" ? "en-US" : "pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(record.startedAt ?? record.finishedAt))} · ${record.company} · ${record.operator}`;
+  `${new Intl.DateTimeFormat(locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(record.startedAt ?? record.finishedAt))} · ${record.company} · ${record.operator}`;
 const getTimeValue = (timestamp: string) => {
   const date = new Date(timestamp);
   return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
 };
 const formatDateTime = (timestamp: string | null, locale: Locale = "pt-BR") =>
   timestamp
-    ? new Intl.DateTimeFormat(locale === "en" ? "en-US" : "pt-BR", {
+    ? new Intl.DateTimeFormat(locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR", {
         dateStyle: "short",
         timeStyle: "short",
       }).format(new Date(timestamp))
-    : locale === "en" ? "Not provided" : "Não informado";
+    : locale === "en" ? "Not provided" : locale === "es" ? "No informado" : "Não informado";
 const formatShiftDuration = (startedAt: string | null, finishedAt: string, locale: Locale = "pt-BR") =>
   startedAt
     ? formatDuration(
         new Date(finishedAt).getTime() - new Date(startedAt).getTime()
       )
-    : locale === "en" ? "Not provided" : "Não informado";
+    : locale === "en" ? "Not provided" : locale === "es" ? "No informado" : "Não informado";
 export const isHistoryExpired = (records: ShiftHistoryRecord[]) =>
   records.some(
     record => Date.now() - new Date(record.finishedAt).getTime() >= RETENTION_MS
   );
 const formatAuditEvent = (event: AuditEvent, locale: Locale = "pt-BR") => {
   const method = event.type === "withdrawal"
-    ? locale === "en" ? "Withdrawal" : "Sangria"
-    : locale === "en" ? "Supply" : "Suprimento";
+    ? locale === "en" ? "Withdrawal" : locale === "es" ? "Retiro" : "Sangria"
+    : locale === "en" ? "Supply" : locale === "es" ? "Ingreso" : "Suprimento";
   if (event.action === "created")
     return locale === "en"
       ? `${method} added: ${formatCurrency(event.current?.amount ?? 0)}.`
-      : `${method} incluído: ${formatCurrency(event.current?.amount ?? 0)}.`;
+      : locale === "es"
+        ? `${method} añadido: ${formatCurrency(event.current?.amount ?? 0)}.`
+        : `${method} incluído: ${formatCurrency(event.current?.amount ?? 0)}.`;
   if (event.action === "deleted")
     return locale === "en"
       ? `${method} deleted: ${formatCurrency(event.previous?.amount ?? 0)}.`
-      : `${method} excluído: ${formatCurrency(event.previous?.amount ?? 0)}.`;
+      : locale === "es"
+        ? `${method} eliminado: ${formatCurrency(event.previous?.amount ?? 0)}.`
+        : `${method} excluído: ${formatCurrency(event.previous?.amount ?? 0)}.`;
   return locale === "en"
     ? `${method} changed: ${formatCurrency(event.previous?.amount ?? 0)} → ${formatCurrency(event.current?.amount ?? 0)}.`
-    : `${method} alterado: ${formatCurrency(event.previous?.amount ?? 0)} → ${formatCurrency(event.current?.amount ?? 0)}.`;
+    : locale === "es"
+      ? `${method} modificado: ${formatCurrency(event.previous?.amount ?? 0)} → ${formatCurrency(event.current?.amount ?? 0)}.`
+      : `${method} alterado: ${formatCurrency(event.previous?.amount ?? 0)} → ${formatCurrency(event.current?.amount ?? 0)}.`;
 };
 export function exportHistoryPdf(
   records: ShiftHistoryRecord[],
@@ -362,9 +379,9 @@ export function exportHistoryPdf(
     document.setFontSize(11);
     document.setTextColor(255, 255, 255);
     document.text(
-              continued
-        ? reportLocale === "en" ? "HISTORY REPORT · CONTINUED" : "RELATÓRIO DE HISTÓRICO · CONTINUAÇÃO"
-        : reportLocale === "en" ? "LOCAL HISTORY REPORT" : "RELATÓRIO DE HISTÓRICO LOCAL",
+      continued
+        ? localize(reportLocale, "HISTORY REPORT · CONTINUED", "INFORME DE HISTORIAL · CONTINUACIÓN", "RELATÓRIO DE HISTÓRICO · CONTINUAÇÃO")
+        : localize(reportLocale, "LOCAL HISTORY REPORT", "INFORME DE HISTORIAL LOCAL", "RELATÓRIO DE HISTÓRICO LOCAL"),
 
       pageWidth - margin,
       14,
@@ -374,7 +391,7 @@ export function exportHistoryPdf(
     document.setFontSize(7.4);
     document.setTextColor(211, 237, 220);
     document.text(
-      reportLocale === "en" ? "Operational archive · Local retention up to 3 days" : "Arquivamento operacional · Retenção local de até 3 dias",
+      localize(reportLocale, "Operational archive · Local retention up to 3 days", "Archivo operativo · Retención local de hasta 3 días", "Arquivamento operacional · Retenção local de até 3 dias"),
       pageWidth - margin,
       20,
       { align: "right" }
@@ -388,11 +405,11 @@ export function exportHistoryPdf(
     document.setFontSize(7);
     document.setTextColor(100, 118, 108);
     document.text(
-      `${reportLocale === "en" ? "Generated on" : "Gerado em"} ${generatedAt} · ${reportLocale === "en" ? "Local history on this machine" : "Histórico local desta máquina"}`,
+      `${localize(reportLocale, "Generated on", "Generado el", "Gerado em")} ${generatedAt} · ${localize(reportLocale, "Local history on this machine", "Historial local en este dispositivo", "Histórico local desta máquina")}`,
       margin,
       pageHeight - 8
     );
-    document.text(`${reportLocale === "en" ? "Page" : "Página"} ${page}`, pageWidth - margin, pageHeight - 8, {
+    document.text(`${localize(reportLocale, "Page", "Página", "Página")} ${page}`, pageWidth - margin, pageHeight - 8, {
       align: "right",
     });
   };
@@ -460,26 +477,30 @@ export function exportHistoryPdf(
   document.setFont("helvetica", "normal");
   document.setFontSize(8);
   document.setTextColor(94, 112, 102);
-  document.text(`${reportLocale === "en" ? "Issued on" : "Emitido em"} ${generatedAt}`, margin, cursorY);
+  document.text(`${localize(reportLocale, "Issued on", "Emitido el", "Emitido em")} ${generatedAt}`, margin, cursorY);
   document.text(
-    reportLocale === "en" ? `${records.length} shift${records.length === 1 ? "" : "s"} in period` : `${records.length} turno${records.length === 1 ? "" : "s"} no período`,
+    reportLocale === "en"
+      ? `${records.length} shift${records.length === 1 ? "" : "s"} in period`
+      : reportLocale === "es"
+        ? `${records.length} turno${records.length === 1 ? "" : "s"} en el período`
+        : `${records.length} turno${records.length === 1 ? "" : "s"} no período`,
     pageWidth - margin,
     cursorY,
     { align: "right" }
   );
   cursorY += 7;
-  sectionTitle(reportLocale === "en" ? "Period summary" : "Resumo do período", reportLocale === "en" ? "Consolidation of available records" : "Consolidação dos registros disponíveis");
-  metric(margin, reportLocale === "en" ? "Closed shifts" : "Turnos fechados", String(records.length), "green");
+  sectionTitle(localize(reportLocale, "Period summary", "Resumen del período", "Resumo do período"), localize(reportLocale, "Consolidation of available records", "Consolidación de los registros disponibles", "Consolidação dos registros disponíveis"));
+  metric(margin, localize(reportLocale, "Closed shifts", "Turnos cerrados", "Turnos fechados"), String(records.length), "green");
   metric(
     margin + 45,
-    reportLocale === "en" ? "Expected total" : "Total esperado",
+    localize(reportLocale, "Expected total", "Total esperado", "Total esperado"),
     formatCurrency(summary.expected),
     "dark"
   );
-  metric(margin + 90, reportLocale === "en" ? "Counted total" : "Total conferido", formatCurrency(summary.found), "aqua");
+  metric(margin + 90, localize(reportLocale, "Counted total", "Total contado", "Total conferido"), formatCurrency(summary.found), "aqua");
   metric(
     margin + 135,
-    reportLocale === "en" ? "Difference" : "Divergência",
+    localize(reportLocale, "Difference", "Diferencia", "Divergência"),
     `${summary.difference > 0 ? "+" : ""}${formatCurrency(summary.difference)}`,
     summary.difference === 0 ? "green" : "alert"
   );
@@ -490,21 +511,29 @@ export function exportHistoryPdf(
   document.setFontSize(7.3);
   document.setTextColor(27, 87, 52);
   document.text(
-    reportLocale === "en" ? `${summary.breaks} shift${summary.breaks === 1 ? "" : "s"} with discrepancy · ${summary.audits} audit event${summary.audits === 1 ? "" : "s"} recorded` : `${summary.breaks} turno${summary.breaks === 1 ? "" : "s"} com quebra · ${summary.audits} evento${summary.audits === 1 ? "" : "s"} de auditoria registrados`,
+    reportLocale === "en"
+      ? `${summary.breaks} shift${summary.breaks === 1 ? "" : "s"} with discrepancy · ${summary.audits} audit event${summary.audits === 1 ? "" : "s"} recorded`
+      : reportLocale === "es"
+        ? `${summary.breaks} turno${summary.breaks === 1 ? "" : "s"} con diferencia · ${summary.audits} evento${summary.audits === 1 ? "" : "s"} de auditoría registrado${summary.audits === 1 ? "" : "s"}`
+        : `${summary.breaks} turno${summary.breaks === 1 ? "" : "s"} com quebra · ${summary.audits} evento${summary.audits === 1 ? "" : "s"} de auditoria registrados`,
     margin + 4,
     cursorY + 7.5
   );
   cursorY += 20;
   sectionTitle(
-    reportLocale === "en" ? "Consolidated shifts" : "Turnos consolidados",
-    reportLocale === "en" ? "Values, movements, and audit trail" : "Valores, lançamentos e trilha de auditoria"
+    localize(reportLocale, "Consolidated shifts", "Turnos consolidados", "Turnos consolidados"),
+    localize(reportLocale, "Values, movements, and audit trail", "Valores, movimientos y auditoría", "Valores, lançamentos e trilha de auditoria")
   );
 
   orderedRecords.forEach((record, index) => {
     const statusLabel =
       record.status === "SEM QUEBRA"
-        ? reportLocale === "en" ? "NO DISCREPANCY" : "SEM QUEBRA"
-        : reportLocale === "en" ? `DISCREPANCY · ${record.status === "SOBRA" ? "SURPLUS" : "SHORTAGE"}` : `QUEBRA · ${record.status}`;
+        ? localize(reportLocale, "NO DISCREPANCY", "SIN DIFERENCIA", "SEM QUEBRA")
+        : reportLocale === "en"
+          ? `DISCREPANCY · ${record.status === "SOBRA" ? "SURPLUS" : "SHORTAGE"}`
+          : reportLocale === "es"
+            ? `DIFERENCIA · ${record.status === "SOBRA" ? "SOBRANTE" : "FALTANTE"}`
+            : `QUEBRA · ${record.status}`;
     const statusColor: [number, number, number] =
       record.status === "SEM QUEBRA"
         ? [37, 124, 74]
@@ -523,14 +552,14 @@ export function exportHistoryPdf(
     document.setFont("helvetica", "normal");
     document.setFontSize(7.2);
     document.setTextColor(92, 111, 101);
-    document.text(`${reportLocale === "en" ? "Operator:" : "Operador:"} ${record.operator}`, margin + 6, cursorY + 14);
+    document.text(`${localize(reportLocale, "Operator:", "Operador:", "Operador:")} ${record.operator}`, margin + 6, cursorY + 14);
     document.text(
-      `${reportLocale === "en" ? "Opening:" : "Abertura:"} ${formatDateTime(record.startedAt, reportLocale)} · ${reportLocale === "en" ? "Closing:" : "Fechamento:"} ${formatDateTime(record.finishedAt, reportLocale)}`,
+      `${localize(reportLocale, "Opening:", "Apertura:", "Abertura:")} ${formatDateTime(record.startedAt, reportLocale)} · ${localize(reportLocale, "Closing:", "Cierre:", "Fechamento:")} ${formatDateTime(record.finishedAt, reportLocale)}`,
       margin + 6,
       cursorY + 20
     );
     document.text(
-      `${reportLocale === "en" ? "Duration:" : "Duração:"} ${formatShiftDuration(record.startedAt, record.finishedAt, reportLocale)}`,
+      `${localize(reportLocale, "Duration:", "Duración:", "Duração:")} ${formatShiftDuration(record.startedAt, record.finishedAt, reportLocale)}`,
       margin + 6,
       cursorY + 25.5
     );
@@ -553,26 +582,30 @@ export function exportHistoryPdf(
     cursorY += 37;
     ensureSpace(18);
     const metricY = cursorY;
-    metric(margin, reportLocale === "en" ? "Expected" : "Esperado", formatCurrency(record.totalExpected), "dark");
-    metric(margin + 45, reportLocale === "en" ? "Counted" : "Conferido", formatCurrency(record.totalFound), "aqua");
+    metric(margin, localize(reportLocale, "Expected", "Esperado", "Esperado"), formatCurrency(record.totalExpected), "dark");
+    metric(margin + 45, localize(reportLocale, "Counted", "Contado", "Conferido"), formatCurrency(record.totalFound), "aqua");
     metric(
       margin + 90,
-      reportLocale === "en" ? "Difference" : "Diferença",
+      localize(reportLocale, "Difference", "Diferencia", "Diferença"),
       `${record.difference > 0 ? "+" : ""}${formatCurrency(record.difference)}`,
       record.difference === 0 ? "green" : "alert"
     );
     metric(
       margin + 135,
-      reportLocale === "en" ? "Audit trail" : "Auditoria",
-      `${record.auditTrail.length} ${reportLocale === "en" ? "event" : "evento"}${record.auditTrail.length === 1 ? "" : "s"}`,
+      localize(reportLocale, "Audit trail", "Auditoría", "Auditoria"),
+      `${record.auditTrail.length} ${localize(reportLocale, "event", "evento", "evento")}${record.auditTrail.length === 1 ? "" : "s"}`,
       "green"
     );
     cursorY = metricY + 27;
     if (record.cashEntries.length > 0) {
       const cashEntryTotal = sumCashEntries(record.cashEntries);
       sectionTitle(
-        reportLocale === "en" ? "Cash entries" : "Entradas em espécie",
-        `${record.cashEntries.length} ${reportLocale === "en" ? record.cashEntries.length === 1 ? "entry" : "entries" : `lançamento${record.cashEntries.length === 1 ? "" : "s"}`}`
+        localize(reportLocale, "Cash entries", "Entradas de efectivo", "Entradas em espécie"),
+        reportLocale === "en"
+          ? `${record.cashEntries.length} ${record.cashEntries.length === 1 ? "entry" : "entries"}`
+          : reportLocale === "es"
+            ? `${record.cashEntries.length} entrada${record.cashEntries.length === 1 ? "" : "s"}`
+            : `${record.cashEntries.length} lançamento${record.cashEntries.length === 1 ? "" : "s"}`
       );
       record.cashEntries.forEach(entry => {
         ensureSpace(14);
@@ -580,13 +613,13 @@ export function exportHistoryPdf(
         document.setFontSize(7.5);
         document.setTextColor(31, 61, 43);
         document.text(
-          `${reportLocale === "en" ? "Cash entry" : "Entrada em dinheiro"} · ${formatShortTime(entry.createdAt)}`,
+          `${localize(reportLocale, "Cash entry", "Entrada de efectivo", "Entrada em dinheiro")} · ${formatShortTime(entry.createdAt)}`,
           margin + 2,
           cursorY
         );
         document.setTextColor(37, 124, 74);
         document.text(
-          `${reportLocale === "en" ? "Net +" : "Líquido +"}${formatCurrency(entry.amount)}`,
+          `${localize(reportLocale, "Net +", "Neto +", "Líquido +")}${formatCurrency(entry.amount)}`,
           pageWidth - margin,
           cursorY,
           { align: "right" }
@@ -595,7 +628,7 @@ export function exportHistoryPdf(
         document.setFontSize(6.5);
         document.setTextColor(109, 86, 47);
         document.text(
-          `${reportLocale === "en" ? "Received" : "Recebido"} ${formatCurrency(getGrossAmount(entry))} · ${getChangeAmount(entry) > 0 ? `${reportLocale === "en" ? "change" : "troco"} ${formatCurrency(getChangeAmount(entry))}` : reportLocale === "en" ? "no change" : "sem troco"}`,
+          `${localize(reportLocale, "Received", "Recibido", "Recebido")} ${formatCurrency(getGrossAmount(entry))} · ${getChangeAmount(entry) > 0 ? `${localize(reportLocale, "change", "cambio", "troco")} ${formatCurrency(getChangeAmount(entry))}` : localize(reportLocale, "no change", "sin cambio", "sem troco")}`,
           margin + 2,
           cursorY + 3.6
         );
@@ -604,7 +637,7 @@ export function exportHistoryPdf(
       ensureSpace(9);
       document.setFont("helvetica", "bold");
       document.setTextColor(27, 87, 52);
-      document.text(reportLocale === "en" ? "Total cash entries" : "Total acumulado em espécie", margin + 2, cursorY);
+      document.text(localize(reportLocale, "Total cash entries", "Total acumulado en efectivo", "Total acumulado em espécie"), margin + 2, cursorY);
       document.text(
         formatCurrency(cashEntryTotal),
         pageWidth - margin,
@@ -615,8 +648,12 @@ export function exportHistoryPdf(
     }
     if (record.adjustments.length > 0) {
       sectionTitle(
-        reportLocale === "en" ? "Movements" : "Lançamentos",
-        `${record.adjustments.length} ${reportLocale === "en" ? record.adjustments.length === 1 ? "item" : "items" : `item${record.adjustments.length === 1 ? "" : "ns"}`}`
+        localize(reportLocale, "Movements", "Movimientos", "Lançamentos"),
+        reportLocale === "en"
+          ? `${record.adjustments.length} ${record.adjustments.length === 1 ? "item" : "items"}`
+          : reportLocale === "es"
+            ? `${record.adjustments.length} movimiento${record.adjustments.length === 1 ? "" : "s"}`
+            : `${record.adjustments.length} item${record.adjustments.length === 1 ? "" : "ns"}`
       );
       record.adjustments.forEach(entry => {
         const entryColor: [number, number, number] =
@@ -626,7 +663,7 @@ export function exportHistoryPdf(
         document.setFontSize(7.5);
         document.setTextColor(31, 61, 43);
         document.text(
-          `${entry.type === "withdrawal" ? reportLocale === "en" ? "Withdrawal" : "Sangria" : reportLocale === "en" ? "Supply" : "Suprimento"} · ${formatShortTime(entry.createdAt)}`,
+          `${entry.type === "withdrawal" ? localize(reportLocale, "Withdrawal", "Retiro", "Sangria") : localize(reportLocale, "Supply", "Ingreso", "Suprimento")} · ${formatShortTime(entry.createdAt)}`,
           margin + 2,
           cursorY
         );
@@ -640,7 +677,7 @@ export function exportHistoryPdf(
         document.setFont("helvetica", "normal");
         document.setTextColor(94, 112, 102);
         const notes = textLines(
-          entry.note || (reportLocale === "en" ? "No description" : "Sem identificação"),
+          entry.note || localize(reportLocale, "No description", "Sin descripción", "Sem identificação"),
           contentWidth - 8
         );
         document.text(notes, margin + 2, cursorY + 4);
@@ -651,10 +688,10 @@ export function exportHistoryPdf(
       });
     }
     if (record.auditTrail.length > 0) {
-      sectionTitle(reportLocale === "en" ? "Audit trail" : "Trilha de auditoria", reportLocale === "en" ? "Justified changes" : "Alterações justificadas");
+      sectionTitle(localize(reportLocale, "Audit trail", "Auditoría", "Trilha de auditoria"), localize(reportLocale, "Justified changes", "Cambios justificados", "Alterações justificadas"));
       record.auditTrail.forEach(event => {
         const body = `${formatShortTime(event.occurredAt)} · ${formatAuditEvent(event, reportLocale)}`;
-        const reason = `${reportLocale === "en" ? "Reason:" : "Justificativa:"} ${event.justification || (reportLocale === "en" ? "Not provided" : "Não informada")}`;
+        const reason = `${localize(reportLocale, "Reason:", "Motivo:", "Justificativa:")} ${event.justification || localize(reportLocale, "Not provided", "No informado", "Não informada")}`;
         const bodyLines = textLines(body, contentWidth - 10, 7.5);
         const reasonLines = textLines(reason, contentWidth - 10, 7.2);
         ensureSpace(7 + bodyLines.length * 3.5 + reasonLines.length * 3.5);
@@ -692,8 +729,8 @@ export function exportHistoryPdf(
   });
   drawFooter(pageNumber);
   document.setProperties({
-    title: reportLocale === "en" ? "PixBee FechaCaixa — History Report" : "PixBee FechaCaixa — Relatório de Histórico",
-    subject: reportLocale === "en" ? "Local shift and audit report" : "Relatório local de turnos e auditoria",
+    title: localize(reportLocale, "PixBee FechaCaixa — History Report", "PixBee FechaCaixa — Informe de historial", "PixBee FechaCaixa — Relatório de Histórico"),
+    subject: localize(reportLocale, "Local shift and audit report", "Informe local de turnos y auditoría", "Relatório local de turnos e auditoria"),
   });
   const filename =
     options.filename ??
@@ -793,7 +830,7 @@ function MethodToggle({
     withdrawal: { title: "Withdrawal", description: "Amount removed during the shift." },
     supply: { title: "Supply", description: "Amount added to the drawer." },
   };
-  const displayInfo = locale === "en" ? englishInfo[method] : info;
+  const displayInfo = locale === "en" ? englishInfo[method] : locale === "es" ? SPANISH_METHOD_INFO[method] : info;
   const Icon = info.icon;
   return (
     <label className={`method-toggle ${selected ? "selected" : ""}`}>
@@ -833,12 +870,12 @@ export function OpeningPage() {
     }));
   function advance() {
     const missing = [
-      !session.operator.trim() ? locale === "en" ? "the operator name" : "o nome do operador" : "",
-      !session.company.trim() ? locale === "en" ? "the company name" : "o nome da empresa" : "",
-      session.selectedMethods.length === 0 ? locale === "en" ? "at least one payment method" : "ao menos uma modalidade" : "",
+      !session.operator.trim() ? localize(locale, "the operator name", "el nombre de la persona operadora", "o nome do operador") : "",
+      !session.company.trim() ? localize(locale, "the company name", "el nombre de la empresa", "o nome da empresa") : "",
+      session.selectedMethods.length === 0 ? localize(locale, "at least one payment method", "al menos una modalidad", "ao menos uma modalidade") : "",
     ].filter(Boolean);
     if (missing.length) {
-      toast.error(locale === "en" ? `Enter ${missing.join(", ")} to start the count.` : `Preencha ${missing.join(", ")} para iniciar a contagem.`);
+      toast.error(localize(locale, `Enter ${missing.join(", ")} to start the count.`, `Introduce ${missing.join(", ")} para iniciar el conteo.`, `Preencha ${missing.join(", ")} para iniciar a contagem.`));
       return;
     }
     if (session.shiftId && session.startedAt && session.openingFloat !== null) {
@@ -889,17 +926,17 @@ export function OpeningPage() {
     navigate("/contagem");
   }
   return (
-    <AppShell title="Abertura de contagem" currentStep={2}>
+    <AppShell title={localize(locale, "Count opening", "Apertura del conteo", "Abertura de contagem")} currentStep={2}>
       <section className="glass-panel flow-panel opening-panel">
         <div className="flow-heading">
-          <span>{locale === "en" ? "Step 01" : t("opening.step")}</span>
-          <h2>{locale === "en" ? "Identify the drawer and choose what to reconcile." : t("opening.title")}</h2>
-          <p>{locale === "en" ? "These details form the basis of your final validation." : t("opening.copy")}</p>
+          <span>{localize(locale, "Step 01", "Etapa 01", t("opening.step"))}</span>
+          <h2>{localize(locale, "Identify the drawer and choose what to reconcile.", "Identifica la caja y elige qué vas a conciliar.", t("opening.title"))}</h2>
+          <p>{localize(locale, "These details form the basis of your final validation.", "Estos datos forman la base de tu validación final.", t("opening.copy"))}</p>
         </div>
         <div className="opening-fields">
           <label>
             <span>
-              <UserRound size={15} /> {locale === "en" ? "Cash operator" : "Operador do caixa"}
+              <UserRound size={15} /> {localize(locale, "Cash operator", "Persona operadora de caja", "Operador do caixa")}
             </span>
             <input
               value={session.operator}
@@ -909,12 +946,12 @@ export function OpeningPage() {
                   operator: event.target.value,
                 }))
               }
-              placeholder={locale === "en" ? "Enter your name" : "Digite seu nome"}
+              placeholder={localize(locale, "Enter your name", "Introduce tu nombre", "Digite seu nome")}
             />
           </label>
           <label>
             <span>
-              <Building2 size={15} /> {locale === "en" ? "Company name" : "Nome da empresa"}
+              <Building2 size={15} /> {localize(locale, "Company name", "Nombre de la empresa", "Nome da empresa")}
             </span>
             <input
               value={session.company}
@@ -924,12 +961,12 @@ export function OpeningPage() {
                   company: event.target.value,
                 }))
               }
-              placeholder={locale === "en" ? "Enter the company" : "Digite a empresa"}
+              placeholder={localize(locale, "Enter the company", "Introduce la empresa", "Digite a empresa")}
             />
           </label>
           <label>
             <span>
-              <ReceiptText size={15} /> {locale === "en" ? "Shift identification" : "Identificação do turno"}
+              <ReceiptText size={15} /> {localize(locale, "Shift identification", "Identificación del turno", "Identificação do turno")}
             </span>
             <input
               value={session.shiftLabel}
@@ -939,12 +976,12 @@ export function OpeningPage() {
                   shiftLabel: event.target.value,
                 }))
               }
-              placeholder={locale === "en" ? "E.g. Morning, Drawer 1 or 08/24" : "Ex.: Manhã, Caixa 1 ou 24/08"}
+              placeholder={localize(locale, "E.g. Morning, Drawer 1 or 08/24", "Ej.: Mañana, Caja 1 o 24/08", "Ex.: Manhã, Caixa 1 ou 24/08")}
             />
           </label>
           <label>
             <span>
-              <Clock3 size={15} /> {locale === "en" ? "Shift duration" : "Duração do turno"}
+              <Clock3 size={15} /> {locale === "en" ? "Shift duration" : locale === "es" ? "Duración del turno" : "Duração do turno"}
             </span>
             <Select
               value={String(session.durationHours)}
@@ -955,35 +992,33 @@ export function OpeningPage() {
                 }))
               }
             >
-              <SelectTrigger aria-label={locale === "en" ? "Shift duration" : "Duração do turno"}>
-                <SelectValue placeholder={locale === "en" ? "Choose a duration" : "Escolha a duração"} />
+              <SelectTrigger aria-label={locale === "en" ? "Shift duration" : locale === "es" ? "Duración del turno" : "Duração do turno"}>
+              <SelectValue placeholder={localize(locale, "Choose a duration", "Elige una duración", "Escolha a duração")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="6">{locale === "en" ? "6 hours" : "6 horas"}</SelectItem>
-                <SelectItem value="8">{locale === "en" ? "8 hours" : "8 horas"}</SelectItem>
-                <SelectItem value="12">{locale === "en" ? "12 hours" : "12 horas"}</SelectItem>
+                <SelectItem value="6">{locale === "en" ? "6 hours" : locale === "es" ? "6 horas" : "6 horas"}</SelectItem>
+                <SelectItem value="8">{locale === "en" ? "8 hours" : locale === "es" ? "8 horas" : "8 horas"}</SelectItem>
+                <SelectItem value="12">{locale === "en" ? "12 hours" : locale === "es" ? "12 horas" : "12 horas"}</SelectItem>
               </SelectContent>
             </Select>
           </label>
         </div>
         {hasPreviousPhysicalCount ? (
-          <section className="opening-import-choice" aria-label={locale === "en" ? "Last count import" : "Importação da última contagem"}>
+          <section className="opening-import-choice" aria-label={localize(locale, "Last count import", "Importación del último conteo", "Importação da última contagem")}>
             <div>
-              <span>{locale === "en" ? "Last physical count found" : "Última composição física encontrada"}</span>
+              <span>{localize(locale, "Last physical count found", "Última composición física encontrada", "Última composição física encontrada")}</span>
               <p>
-                {locale === "en"
-                  ? "Use the final notes and coins from the previous closing, or choose manual entry."
-                  : "Use as cédulas e moedas finais do fechamento anterior ou escolha o preenchimento manual."}
+                {localize(locale, "Use the final notes and coins from the previous closing, or choose manual entry.", "Usa los billetes y monedas finales del cierre anterior o elige la carga manual.", "Use as cédulas e moedas finais do fechamento anterior ou escolha o preenchimento manual.")}
               </p>
             </div>
-            <div className="opening-import-actions" role="group" aria-label={locale === "en" ? "Import choice" : "Escolha de importação"}>
+            <div className="opening-import-actions" role="group" aria-label={localize(locale, "Import choice", "Elección de importación", "Escolha de importação")}>
               <Button
                 type="button"
                 variant={importPreviousCount ? "default" : "outline"}
                 className={importPreviousCount ? "opening-import-button selected" : "opening-import-button"}
                 onClick={() => setImportPreviousCount(true)}
               >
-                {locale === "en" ? "Yes, import" : "Sim, importar"}
+                {localize(locale, "Yes, import", "Sí, importar", "Sim, importar")}
               </Button>
               <Button
                 type="button"
@@ -991,20 +1026,18 @@ export function OpeningPage() {
                 className={!importPreviousCount ? "opening-import-button selected" : "opening-import-button"}
                 onClick={() => setImportPreviousCount(false)}
               >
-                {locale === "en" ? "No, enter manually" : "Não, preencher manualmente"}
+                {localize(locale, "No, enter manually", "No, completar manualmente", "Não, preencher manualmente")}
               </Button>
             </div>
           </section>
         ) : null}
         <div className="mode-heading">
           <div>
-            <span>{locale === "en" ? "Count methods" : "Modalidades de contagem"}</span>
-            <h3>{locale === "en" ? "What would you like to reconcile in this drawer?" : "O que você quer conferir neste caixa?"}</h3>
+            <span>{localize(locale, "Count methods", "Modalidades de conteo", "Modalidades de contagem")}</span>
+            <h3>{localize(locale, "What would you like to reconcile in this drawer?", "¿Qué quieres conciliar en esta caja?", "O que você quer conferir neste caixa?")}</h3>
           </div>
           <p>
-            {locale === "en"
-              ? "You will enter the expected and counted amounts in the next step."
-              : "Você poderá informar o valor esperado e o valor encontrado na próxima etapa."}
+            {localize(locale, "You will enter the expected and counted amounts in the next step.", "Podrás informar el importe esperado y el contado en la próxima etapa.", "Você poderá informar o valor esperado e o valor encontrado na próxima etapa.")}
           </p>
         </div>
         <div className="method-grid">
@@ -1019,10 +1052,10 @@ export function OpeningPage() {
         </div>
         <div className="flow-actions">
           <Link href="/" className="pixbee-text-button">
-            <ArrowLeft size={17} /> {locale === "en" ? "Back" : "Voltar"}
+            <ArrowLeft size={17} /> {locale === "en" ? "Back" : locale === "es" ? "Atrás" : "Voltar"}
           </Link>
           <Button className="pixbee-primary-button" onClick={advance}>
-            {locale === "en" ? "Start count" : "Começar contagem"} <ArrowRight size={18} />
+            {locale === "en" ? "Start count" : locale === "es" ? "Iniciar conteo" : "Começar contagem"} <ArrowRight size={18} />
           </Button>
         </div>
       </section>
@@ -1069,17 +1102,17 @@ export function OpeningFloatDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="money-count-dialog">
         <DialogHeader>
-          <DialogTitle>{locale === "en" && title === "Conte o fundo de caixa" ? "Count the opening float" : title}</DialogTitle>
-          <DialogDescription>{locale === "en" && description === "Registre as cédulas e moedas disponíveis antes de iniciar. O total será levado automaticamente para a conferência do turno." ? "Record the notes and coins available before starting. The total will be carried into the shift reconciliation automatically." : description}</DialogDescription>
+          <DialogTitle>{title === "Conte o fundo de caixa" ? localize(locale, "Count the opening float", "Cuenta el fondo inicial", title) : title}</DialogTitle>
+          <DialogDescription>{description === "Registre as cédulas e moedas disponíveis antes de iniciar. O total será levado automaticamente para a conferência do turno." ? localize(locale, "Record the notes and coins available before starting. The total will be carried into the shift reconciliation automatically.", "Registra los billetes y monedas disponibles antes de comenzar. El total se llevará automáticamente a la conciliación del turno.", description) : description}</DialogDescription>
         </DialogHeader>
         <div className="money-count-summary">
-          <span>{locale === "en" && summaryLabel === "Fundo de caixa apurado" ? "Counted opening float" : summaryLabel}</span>
+          <span>{summaryLabel === "Fundo de caixa apurado" ? localize(locale, "Counted opening float", "Fondo inicial contado", summaryLabel) : summaryLabel}</span>
           <strong>{formatCurrency(openingFloat)}</strong>
         </div>
         <div className="money-count-columns">
           <section>
             <div className="denomination-heading">
-              <span><Banknote size={16} /> {locale === "en" ? "Notes" : "Cédulas"}</span>
+              <span><Banknote size={16} /> {locale === "en" ? "Notes" : locale === "es" ? "Billetes" : "Cédulas"}</span>
               <strong>{formatCurrency(sumDenominationQuantities(Object.fromEntries(NOTE_DENOMINATIONS.map(item => [item.key, quantities[item.key] ?? 0]))))}</strong>
             </div>
             {NOTE_DENOMINATIONS.map(item => (
@@ -1093,7 +1126,7 @@ export function OpeningFloatDialog({
           </section>
           <section>
             <div className="denomination-heading">
-              <span><Coins size={16} /> {locale === "en" ? "Coins" : "Moedas"}</span>
+              <span><Coins size={16} /> {locale === "en" ? "Coins" : locale === "es" ? "Monedas" : "Moedas"}</span>
               <strong>{formatCurrency(sumDenominationQuantities(Object.fromEntries(COIN_DENOMINATIONS.map(item => [item.key, quantities[item.key] ?? 0]))))}</strong>
             </div>
             {COIN_DENOMINATIONS.map(item => (
@@ -1108,10 +1141,10 @@ export function OpeningFloatDialog({
         </div>
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            {locale === "en" ? "Back" : "Voltar"}
+            {locale === "en" ? "Back" : locale === "es" ? "Atrás" : "Voltar"}
           </Button>
           <Button type="button" className="pixbee-primary-button" onClick={() => onConfirm(quantities, openingFloat)}>
-            {locale === "en" && confirmLabel === "Confirmar fundo de caixa" ? "Confirm opening float" : confirmLabel} <ArrowRight size={17} />
+            {confirmLabel === "Confirmar fundo de caixa" ? localize(locale, "Confirm opening float", "Confirmar fondo inicial", confirmLabel) : confirmLabel} <ArrowRight size={17} />
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -1169,14 +1202,14 @@ function QuantityControl({
         {item.label}
         {available !== undefined ? (
           <small className="denomination-availability">
-            {locale === "en" ? "Available" : "Disponível"}: {available}
+            {locale === "en" ? "Available" : locale === "es" ? "Disponible" : "Disponível"}: {available}
           </small>
         ) : null}
       </strong>
       <div className="quantity-controls">
         <button
           type="button"
-          aria-label={`Diminuir ${item.label}`}
+          aria-label={`${localize(locale, "Decrease", "Disminuir", "Diminuir")} ${item.label}`}
           onClick={() => onChange(Math.max(0, quantity - 1))}
         >
           <Minus size={15} />
@@ -1199,7 +1232,7 @@ function QuantityControl({
         />
         <button
           type="button"
-          aria-label={`Aumentar ${item.label}`}
+          aria-label={`${localize(locale, "Increase", "Aumentar", "Aumentar")} ${item.label}`}
           disabled={available !== undefined && quantity >= available}
           onClick={() => onChange(Math.min(available ?? Number.POSITIVE_INFINITY, quantity + 1))}
         >
@@ -1227,14 +1260,14 @@ export function DenominationRow({
         {item.label}
         <small>
           {openingQuantity > 0
-            ? locale === "en" ? `Opening float confirmed: ${openingQuantity}` : `Fundo confirmado: ${openingQuantity}`
-            : locale === "en" ? "No units in opening float" : "Sem unidades no fundo"}
+            ? localize(locale, `Opening float confirmed: ${openingQuantity}`, `Fondo inicial confirmado: ${openingQuantity}`, `Fundo confirmado: ${openingQuantity}`)
+            : localize(locale, "No units in opening float", "Sin unidades en el fondo inicial", "Sem unidades no fundo")}
         </small>
       </strong>
       <div className="quantity-controls">
         <button
           type="button"
-          aria-label={`Diminuir ${item.label}`}
+          aria-label={`${localize(locale, "Decrease", "Disminuir", "Diminuir")} ${item.label}`}
           disabled
         >
           <Minus size={15} />
@@ -1245,11 +1278,11 @@ export function DenominationRow({
           value={quantity === 0 ? "" : quantity}
           placeholder="0"
           readOnly
-          aria-label={`${locale === "en" ? "Protected quantity of" : "Quantidade protegida de"} ${item.label}`}
+          aria-label={`${localize(locale, "Protected quantity of", "Cantidad protegida de", "Quantidade protegida de")} ${item.label}`}
         />
         <button
           type="button"
-          aria-label={`Aumentar ${item.label}`}
+          aria-label={`${localize(locale, "Increase", "Aumentar", "Aumentar")} ${item.label}`}
           disabled
         >
           <Plus size={15} />
@@ -1306,22 +1339,22 @@ function LiveClock({
       <div>
         <Clock3 size={17} />
         <span>
-          <small>{locale === "en" ? "Current time" : "Horário atual"}</small>
+          <small>{locale === "en" ? "Current time" : locale === "es" ? "Hora actual" : "Horário atual"}</small>
           <strong>{time}</strong>
         </span>
       </div>
       <div>
         <RotateCcw size={17} />
         <span>
-          <small>{locale === "en" ? `Count time · ${durationHours}h` : `Tempo de contagem · ${durationHours}h`}</small>
+          <small>{locale === "en" ? `Count time · ${durationHours}h` : locale === "es" ? `Tiempo de conteo · ${durationHours}h` : `Tempo de contagem · ${durationHours}h`}</small>
           <strong>{formatDuration(now.getTime() - start)}</strong>
         </span>
       </div>
       <div>
         <Clock3 size={17} />
         <span>
-          <small>{remaining > 0 ? locale === "en" ? "Time remaining" : "Prazo restante" : locale === "en" ? "Closing required" : "Fechamento obrigatório"}</small>
-          <strong>{remaining > 0 ? formatDuration(remaining) : locale === "en" ? "Now" : "Agora"}</strong>
+          <small>{remaining > 0 ? locale === "en" ? "Time remaining" : locale === "es" ? "Tiempo restante" : "Prazo restante" : locale === "en" ? "Closing required" : locale === "es" ? "Cierre obligatorio" : "Fechamento obrigatório"}</small>
+          <strong>{remaining > 0 ? formatDuration(remaining) : locale === "en" ? "Now" : locale === "es" ? "Ahora" : "Agora"}</strong>
         </span>
       </div>
     </div>
@@ -1368,15 +1401,15 @@ export function ThermalReceipt({
   return (
     <article
       className="thermal-receipt"
-      aria-label={locale === "en" ? "Thermal closing receipt" : "Comprovante térmico de fechamento"}
+      aria-label={localize(locale, "Thermal closing receipt", "Comprobante térmico de cierre", "Comprovante térmico de fechamento")}
     >
       <header className="thermal-header">
         <div className="thermal-mark">
           PIX<span>BEE</span>
         </div>
-        <strong>{locale === "en" ? "CASH CLOSING" : "FECHAMENTO DE CAIXA"}</strong>
+        <strong>{localize(locale, "CASH CLOSING", "CIERRE DE CAJA", "FECHAMENTO DE CAIXA")}</strong>
         <small>
-          {new Intl.DateTimeFormat("pt-BR", {
+          {new Intl.DateTimeFormat(locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR", {
             dateStyle: "short",
             timeStyle: "short",
           }).format(date)}
@@ -1385,51 +1418,51 @@ export function ThermalReceipt({
       <div className="thermal-rule solid" />
       <dl className="thermal-meta">
         <div>
-          <dt>{locale === "en" ? "Company" : "Empresa"}</dt>
-          <dd>{session.company || (locale === "en" ? "Not provided" : "Não informada")}</dd>
+          <dt>{locale === "en" ? "Company" : locale === "es" ? "Empresa" : "Empresa"}</dt>
+          <dd>{session.company || localize(locale, "Not provided", "No informada", "Não informada")}</dd>
         </div>
         <div>
-          <dt>{locale === "en" ? "Operator" : "Operador"}</dt>
-          <dd>{session.operator || (locale === "en" ? "Not provided" : "Não informado")}</dd>
+          <dt>{locale === "en" ? "Operator" : locale === "es" ? "Operador" : "Operador"}</dt>
+          <dd>{session.operator || localize(locale, "Not provided", "No informado", "Não informado")}</dd>
         </div>
         {session.shiftLabel && (
           <div>
-            <dt>{locale === "en" ? "Shift" : "Turno"}</dt>
+            <dt>{locale === "en" ? "Shift" : locale === "es" ? "Turno" : "Turno"}</dt>
             <dd>{session.shiftLabel}</dd>
           </div>
         )}
         <div>
-          <dt>{locale === "en" ? "Opening float" : "Fundo inicial"}</dt>
+          <dt>{locale === "en" ? "Opening float" : locale === "es" ? "Fondo inicial" : "Fundo inicial"}</dt>
           <dd>{formatCurrency(session.openingFloat ?? 0)}</dd>
         </div>
       </dl>
       <section className="thermal-section thermal-period">
-        <h3>{locale === "en" ? "SHIFT PERIOD" : "PERÍODO DO TURNO"}</h3>
+        <h3>{localize(locale, "SHIFT PERIOD", "PERÍODO DEL TURNO", "PERÍODO DO TURNO")}</h3>
         <div className="thermal-row">
-          <span>{locale === "en" ? "Opening" : "Abertura"}</span>
+          <span>{locale === "en" ? "Opening" : locale === "es" ? "Apertura" : "Abertura"}</span>
           <b>{formatDateTime(session.startedAt, locale)}</b>
         </div>
         <div className="thermal-row">
-          <span>{locale === "en" ? "Closing" : "Fechamento"}</span>
+          <span>{locale === "en" ? "Closing" : locale === "es" ? "Cierre" : "Fechamento"}</span>
           <b>{formatDateTime(finishedAt, locale)}</b>
         </div>
         <div className="thermal-row">
-          <span>{locale === "en" ? "Duration" : "Duração"}</span>
+          <span>{locale === "en" ? "Duration" : locale === "es" ? "Duración" : "Duração"}</span>
           <b>
             {finishedAt
               ? formatShiftDuration(session.startedAt, finishedAt, locale)
-              : locale === "en" ? "In progress" : "Em andamento"}
+              : locale === "en" ? "In progress" : locale === "es" ? "En curso" : "Em andamento"}
           </b>
         </div>
       </section>
       <section className="thermal-section">
-        <h3>{locale === "en" ? "RECONCILIATION" : "CONFERÊNCIA"}</h3>
+        <h3>{localize(locale, "RECONCILIATION", "CONCILIACIÓN", "CONFERÊNCIA")}</h3>
         {variations.map(item => (
           <div className="thermal-row" key={item.label}>
             <div>
               <span>{item.label}</span>
               <small>
-                {locale === "en" ? "Expected:" : "Previsto:"} {formatCurrency(item.expected)} · {locale === "en" ? "Diff.:" : "Dif.:"}{" "}
+                {localize(locale, "Expected:", "Esperado:", "Previsto:")} {formatCurrency(item.expected)} · {localize(locale, "Diff.:", "Dif.:", "Dif.:")}{" "}
                 {item.difference > 0 ? "+" : ""}
                 {formatCurrency(item.difference)}
               </small>
@@ -1440,35 +1473,35 @@ export function ThermalReceipt({
       </section>
       {session.cashEntries.length > 0 && (
         <section className="thermal-section thermal-adjustments">
-          <h3>{locale === "en" ? "CASH ENTRIES" : "ENTRADAS EM ESPÉCIE"}</h3>
+          <h3>{localize(locale, "CASH ENTRIES", "ENTRADAS DE EFECTIVO", "ENTRADAS EM ESPÉCIE")}</h3>
           {session.cashEntries.map(entry => (
             <div className="thermal-row" key={entry.id}>
               <div>
-                <span>{locale === "en" ? "Cash entry" : "Entrada em dinheiro"} · {formatShortTime(entry.createdAt)}</span>
+                <span>{locale === "en" ? "Cash entry" : locale === "es" ? "Entrada de efectivo" : "Entrada em dinheiro"} · {formatShortTime(entry.createdAt)}</span>
                 <small>
-                  {locale === "en" ? "Received" : "Recebido"} {formatCurrency(getGrossAmount(entry))}
+                  {localize(locale, "Received", "Recibido", "Recebido")} {formatCurrency(getGrossAmount(entry))}
                   {getChangeAmount(entry) > 0
-                    ? ` · ${locale === "en" ? "change" : "troco"} ${formatCurrency(getChangeAmount(entry))}`
-                    : locale === "en" ? " · no change" : " · sem troco"}
+                    ? ` · ${locale === "en" ? "change" : locale === "es" ? "cambio" : "troco"} ${formatCurrency(getChangeAmount(entry))}`
+                    : ` · ${localize(locale, "no change", "sin cambio", "sem troco")}`}
                 </small>
               </div>
-              <b>{locale === "en" ? "Net +" : "Líquido +"} {formatCurrency(entry.amount)}</b>
+              <b>{localize(locale, "Net +", "Neto +", "Líquido +")} {formatCurrency(entry.amount)}</b>
             </div>
           ))}
           <div className="thermal-row">
-            <span>{locale === "en" ? "Total cash entries" : "Total acumulado em espécie"}</span>
+            <span>{locale === "en" ? "Total cash entries" : locale === "es" ? "Total acumulado en efectivo" : "Total acumulado em espécie"}</span>
             <b>{formatCurrency(cashEntryTotal)}</b>
           </div>
         </section>
       )}
       {session.adjustments.length > 0 && (
         <section className="thermal-section thermal-adjustments">
-          <h3>{locale === "en" ? "CASH MOVEMENTS" : "LANÇAMENTOS DE CAIXA"}</h3>
+          <h3>{localize(locale, "CASH MOVEMENTS", "MOVIMIENTOS DE CAJA", "LANÇAMENTOS DE CAIXA")}</h3>
           {session.adjustments.map(entry => (
             <div className="thermal-row" key={entry.id}>
               <div>
                 <span>
-                  {entry.type === "withdrawal" ? locale === "en" ? "Withdrawal" : "Sangria" : locale === "en" ? "Supply" : "Suprimento"} ·{" "}
+                  {entry.type === "withdrawal" ? localize(locale, "Withdrawal", "Retiro", "Sangria") : localize(locale, "Supply", "Ingreso", "Suprimento")} ·{" "}
                   {formatShortTime(entry.createdAt)}
                 </span>
                 {entry.note ? <small>{entry.note}</small> : null}
@@ -1477,18 +1510,18 @@ export function ThermalReceipt({
             </div>
           ))}
           <div className="thermal-row">
-            <span>{locale === "en" ? "Total withdrawals" : "Total de sangrias"}</span>
+            <span>{locale === "en" ? "Total withdrawals" : locale === "es" ? "Total de retiros" : "Total de sangrias"}</span>
             <b>{formatCurrency(adjustmentTotals.withdrawal)}</b>
           </div>
           <div className="thermal-row">
-            <span>{locale === "en" ? "Total supplies" : "Total de suprimentos"}</span>
+            <span>{locale === "en" ? "Total supplies" : locale === "es" ? "Total de ingresos" : "Total de suprimentos"}</span>
             <b>{formatCurrency(adjustmentTotals.supply)}</b>
           </div>
         </section>
       )}
       {session.auditTrail.length > 0 && (
         <section className="thermal-section thermal-audit">
-          <h3>{locale === "en" ? "AUDIT TRAIL" : "AUDITORIA"}</h3>
+          <h3>{localize(locale, "AUDIT TRAIL", "AUDITORÍA", "AUDITORIA")}</h3>
           {session.auditTrail.map(event => (
             <div className="thermal-row" key={event.id}>
               <div>
@@ -1498,11 +1531,11 @@ export function ThermalReceipt({
                 </span>
                 <small>
                   {event.justification
-                                          ? `${locale === "en" ? "Reason:" : "Justificativa:"} ${event.justification}`
+                                          ? `${localize(locale, "Reason:", "Motivo:", "Justificativa:")} ${event.justification}`
 
                     : event.previous?.note ||
                       event.current?.note ||
-                      (locale === "en" ? "No description" : "Sem identificação")}
+                      localize(locale, "No description", "Sin descripción", "Sem identificação")}
                 </small>
               </div>
             </div>
@@ -1511,16 +1544,22 @@ export function ThermalReceipt({
       )}
       <section className="thermal-total">
         <div>
-          <span>{locale === "en" ? "Expected total" : "Total esperado"}</span>
+          <span>{locale === "en" ? "Expected total" : locale === "es" ? "Total esperado" : "Total esperado"}</span>
           <strong>{formatCurrency(totalExpected)}</strong>
         </div>
         <div>
-          <span>{locale === "en" ? "Counted total" : "Total conferido"}</span>
+          <span>{locale === "en" ? "Counted total" : locale === "es" ? "Total contado" : "Total conferido"}</span>
           <strong>{formatCurrency(totalFound)}</strong>
         </div>
         <div className={status === "SEM QUEBRA" ? "ok" : "break"}>
           <span>
-            {status === "SEM QUEBRA" ? locale === "en" ? "NO DISCREPANCY" : "SEM QUEBRA" : locale === "en" ? `DISCREPANCY — ${status === "SOBRA" ? "SURPLUS" : "SHORTAGE"}` : `QUEBRA — ${status}`}
+            {status === "SEM QUEBRA"
+              ? localize(locale, "NO DISCREPANCY", "SIN DIFERENCIA", "SEM QUEBRA")
+              : locale === "en"
+                ? `DISCREPANCY — ${status === "SOBRA" ? "SURPLUS" : "SHORTAGE"}`
+                : locale === "es"
+                  ? `DIFERENCIA — ${status === "SOBRA" ? "SOBRANTE" : "FALTANTE"}`
+                  : `QUEBRA — ${status}`}
           </span>
           <strong>
             {difference > 0 ? "+" : ""}
@@ -1530,12 +1569,12 @@ export function ThermalReceipt({
       </section>
       {(session.closureNote || session.observation) && (
         <section className="thermal-note">
-          <h3>{locale === "en" ? "NOTE" : "OBSERVAÇÃO"}</h3>
+          <h3>{localize(locale, "NOTE", "OBSERVACIÓN", "OBSERVAÇÃO")}</h3>
           <p>{session.closureNote || session.observation}</p>
         </section>
       )}
       <div className="thermal-rule solid" />
-      <footer>{locale === "en" ? "Single copy · PixBee FechaCaixa" : "Via única · PixBee FechaCaixa"}</footer>
+      <footer>{locale === "en" ? "Single copy · PixBee FechaCaixa" : locale === "es" ? "Copia única · PixBee FechaCaixa" : "Via única · PixBee FechaCaixa"}</footer>
     </article>
   );
 }
@@ -1563,11 +1602,13 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
   const Icon = info.icon;
   const entries = session.adjustments.filter(entry => entry.type === type);
   const total = entries.reduce((sum, entry) => sum + entry.amount, 0);
-  const label = type === "withdrawal" ? (locale === "en" ? "withdrawal" : "sangria") : (locale === "en" ? "supply" : "suprimento");
+  const label = type === "withdrawal"
+    ? locale === "en" ? "withdrawal" : locale === "es" ? "retiro" : "sangria"
+    : locale === "en" ? "supply" : locale === "es" ? "ingreso" : "suprimento";
   function validateAmount() {
     const numericAmount = Number(amount);
     if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-      toast.error(locale === "en" ? `Enter a valid ${label} amount.` : `Informe um valor válido para a ${label}.`);
+      toast.error(locale === "en" ? `Enter a valid ${label} amount.` : locale === "es" ? `Introduce un importe válido para ${label}.` : `Informe um valor válido para a ${label}.`);
       return null;
     }
     return numericAmount;
@@ -1583,7 +1624,7 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
     const composedAmount = sumDenominationQuantities(movementQuantities);
     if (Math.abs(composedAmount - numericAmount) > 0.005) {
       toast.error(
-        locale === "en" ? `The physical composition must total ${formatCurrency(numericAmount)}.` : `A composição física deve totalizar ${formatCurrency(numericAmount)}.`
+        localize(locale, `The physical composition must total ${formatCurrency(numericAmount)}.`, `La composición física debe totalizar ${formatCurrency(numericAmount)}.`, `A composição física deve totalizar ${formatCurrency(numericAmount)}.`)
       );
       return;
     }
@@ -1596,7 +1637,7 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
       )
     ) {
       toast.error(
-        locale === "en" ? "A withdrawal cannot remove units belonging to the opening float." : "A sangria não pode retirar unidades pertencentes ao fundo de abertura."
+        locale === "en" ? "A withdrawal cannot remove units belonging to the opening float." : locale === "es" ? "Un retiro no puede quitar unidades pertenecientes al fondo inicial." : "A sangria não pode retirar unidades pertencentes ao fundo de abertura."
       );
       return;
     }
@@ -1660,11 +1701,11 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
       numericAmount <= 0 ||
       !/^\d{2}:\d{2}$/.test(editingTime)
     ) {
-      toast.error(locale === "en" ? "Enter a valid amount and time before saving." : "Informe valor e horário válidos antes de salvar.");
+      toast.error(locale === "en" ? "Enter a valid amount and time before saving." : locale === "es" ? "Introduce un importe y una hora válidos antes de guardar." : "Informe valor e horário válidos antes de salvar.");
       return;
     }
     if (!editingJustification.trim()) {
-      toast.error(locale === "en" ? "Enter the required reason for this change." : "Informe a justificativa obrigatória para esta alteração.");
+      toast.error(locale === "en" ? "Enter the required reason for this change." : locale === "es" ? "Introduce el motivo obligatorio para este cambio." : "Informe a justificativa obrigatória para esta alteração.");
       return;
     }
     const [hours, minutes] = editingTime.split(":").map(Number);
@@ -1711,7 +1752,7 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
   function confirmDeletion() {
     if (!pendingDeletion) return;
     if (!deletionJustification.trim()) {
-      toast.error(locale === "en" ? "Enter the required reason before deleting." : "Informe a justificativa obrigatória antes de excluir.");
+      toast.error(locale === "en" ? "Enter the required reason before deleting." : locale === "es" ? "Introduce el motivo obligatorio antes de eliminar." : "Informe a justificativa obrigatória antes de excluir.");
       return;
     }
     const auditEvent: AuditEvent = {
@@ -1746,18 +1787,18 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
           <Icon size={19} />
         </span>
         <div>
-          <strong>{locale === "en" ? ENGLISH_METHOD_INFO[type].title : info.title}</strong>
+          <strong>{locale === "en" ? ENGLISH_METHOD_INFO[type].title : locale === "es" ? SPANISH_METHOD_INFO[type].title : info.title}</strong>
           <small>
             {type === "withdrawal"
-              ? locale === "en" ? ENGLISH_METHOD_INFO.withdrawal.description : "Registre cada retirada de dinheiro do caixa."
-              : locale === "en" ? ENGLISH_METHOD_INFO.supply.description : "Registre cada valor colocado no caixa."}
+              ? locale === "en" ? ENGLISH_METHOD_INFO.withdrawal.description : locale === "es" ? SPANISH_METHOD_INFO.withdrawal.description : "Registre cada retirada de dinheiro do caixa."
+              : locale === "en" ? ENGLISH_METHOD_INFO.supply.description : locale === "es" ? SPANISH_METHOD_INFO.supply.description : "Registre cada valor colocado no caixa."}
           </small>
         </div>
         <b>{formatCurrency(total)}</b>
       </header>
       <div className="adjustment-form">
         <label className="amount-input">
-          <span>{locale === "en" ? `${label[0].toUpperCase()}${label.slice(1)} amount` : `Valor da ${label}`}</span>
+          <span>{locale === "en" ? `${label[0].toUpperCase()}${label.slice(1)} amount` : locale === "es" ? `Importe del ${label}` : `Valor da ${label}`}</span>
           <div>
             <b>R$</b>
             <input
@@ -1774,12 +1815,12 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
         </label>
         <label className="adjustment-note-input">
           <span>
-            {locale === "en" ? "Description" : "Identificação"} <small>{locale === "en" ? "optional" : "opcional"}</small>
+            {localize(locale, "Description", "Descripción", "Identificação")} <small>{localize(locale, "optional", "opcional", "opcional")}</small>
           </span>
           <input
             value={note}
             maxLength={48}
-            placeholder={locale === "en" ? "E.g.: transfer to safe" : "Ex.: retirada para cofre"}
+            placeholder={localize(locale, "E.g.: transfer to safe", "Ej.: transferencia a caja fuerte", "Ex.: retirada para cofre")}
             onKeyDown={onEnter}
             onChange={event => setNote(event.target.value)}
           />
@@ -1789,7 +1830,7 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
           type="button"
           onClick={beginAdd}
         >
-          <Plus size={17} /> {locale === "en" ? "Record" : "Registrar"}
+          <Plus size={17} /> {localize(locale, "Record", "Registrar", "Registrar")}
         </Button>
       </div>
       <Dialog open={isPhysicalDialogOpen} onOpenChange={setIsPhysicalDialogOpen}>
@@ -1797,14 +1838,14 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
           <DialogHeader>
             <DialogTitle>
               {type === "withdrawal"
-                ? locale === "en" ? "Count the withdrawn cash" : "Conte a sangria retirada"
-                : locale === "en" ? "Count the added supply" : "Conte o suprimento adicionado"}
+                ? localize(locale, "Count the withdrawn cash", "Cuenta el efectivo retirado", "Conte a sangria retirada")
+                : localize(locale, "Count the added supply", "Cuenta el ingreso añadido", "Conte o suprimento adicionado")}
             </DialogTitle>
             <DialogDescription>
-              {locale === "en" ? "The composition must total exactly " : "A composição deve somar exatamente "}{formatCurrency(Number(amount) || 0)}.
+              {localize(locale, "The composition must total exactly ", "La composición debe sumar exactamente ", "A composição deve somar exatamente ")}{formatCurrency(Number(amount) || 0)}.
               {type === "withdrawal"
-                ? locale === "en" ? " Units from the opening float remain protected." : " As unidades do fundo de abertura permanecem protegidas."
-                : locale === "en" ? " These units will be added to the drawer's physical count." : " Essas unidades serão acrescentadas à contagem física do caixa."}
+                ? localize(locale, " Units from the opening float remain protected.", " Las unidades del fondo inicial permanecen protegidas.", " As unidades do fundo de abertura permanecem protegidas.")
+                : localize(locale, " These units will be added to the drawer's physical count.", " Estas unidades se añadirán al conteo físico de la caja.", " Essas unidades serão acrescentadas à contagem física do caixa.")}
             </DialogDescription>
           </DialogHeader>
           <div className="change-summary-grid">
@@ -1828,7 +1869,7 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
           <div className="money-count-columns">
             <section>
               <div className="denomination-heading">
-                <span><Banknote size={16} /> {locale === "en" ? "Notes" : "Cédulas"}</span>
+                <span><Banknote size={16} /> {locale === "en" ? "Notes" : locale === "es" ? "Billetes" : "Cédulas"}</span>
               </div>
               {NOTE_DENOMINATIONS.map(item => (
                 <QuantityControl
@@ -1846,7 +1887,7 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
             </section>
             <section>
               <div className="denomination-heading">
-                <span><Coins size={16} /> {locale === "en" ? "Coins" : "Moedas"}</span>
+                <span><Coins size={16} /> {locale === "en" ? "Coins" : locale === "es" ? "Monedas" : "Moedas"}</span>
               </div>
               {COIN_DENOMINATIONS.map(item => (
                 <QuantityControl
@@ -1865,11 +1906,11 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
           </div>
           <DialogFooter>
                           <Button type="button" variant="outline" onClick={() => setIsPhysicalDialogOpen(false)}>
-                {locale === "en" ? "Cancel" : "Cancelar"}
+                {locale === "en" ? "Cancel" : locale === "es" ? "Cancelar" : "Cancelar"}
               </Button>
 
                           <Button type="button" className="pixbee-primary-button" onClick={savePhysicalMovement}>
-                {locale === "en" ? "Confirm composition" : "Confirmar composição"} <ArrowRight size={17} />
+                {locale === "en" ? "Confirm composition" : locale === "es" ? "Confirmar composición" : "Confirmar composição"} <ArrowRight size={17} />
               </Button>
 
           </DialogFooter>
@@ -1878,7 +1919,7 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
       <div className="adjustment-history">
         <div>
           <span>
-            {locale === "en" ? `History of ${type === "withdrawal" ? "withdrawals" : "supplies"}` : `Histórico de ${type === "withdrawal" ? "sangrias" : "suprimentos"}`}
+            {locale === "en" ? `History of ${type === "withdrawal" ? "withdrawals" : "supplies"}` : locale === "es" ? `Historial de ${type === "withdrawal" ? "retiros" : "ingresos"}` : `Histórico de ${type === "withdrawal" ? "sangrias" : "suprimentos"}`}
           </span>
           <small>
             {entries.length === 0
@@ -1911,7 +1952,7 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
                 type="button"
                 onClick={() => openEdit(entry)}
                 aria-label={`${locale === "en" ? "Edit" : "Editar"} ${label} ${locale === "en" ? "of" : "de"} ${formatCurrency(entry.amount)}`}
-                title={locale === "en" ? "Edit entry" : "Editar lançamento"}
+                title={locale === "en" ? "Edit entry" : locale === "es" ? "Editar movimiento" : "Editar lançamento"}
               >
                 <Pencil size={13} />
               </button>
@@ -1942,25 +1983,25 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
       >
         <AlertDialogContent className="history-dialog">
           <AlertDialogHeader>
-            <AlertDialogTitle>{locale === "en" ? "Delete this entry?" : "Excluir este lançamento?"}</AlertDialogTitle>
+            <AlertDialogTitle>{localize(locale, "Delete this entry?", "¿Eliminar este movimiento?", "Excluir este lançamento?")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {locale === "en" ? "This action removes the " : "Esta ação remove a "}{label} {locale === "en" ? "of" : "de"}{" "}
-              {pendingDeletion ? formatCurrency(pendingDeletion.amount) : ""} {locale === "en" ? "from the current shift. Enter a reason to preserve the closing audit trail." : "do turno atual. Informe o motivo para preservar a auditoria do fechamento."}
+              {localize(locale, "This action removes the ", "Esta acción elimina el ", "Esta ação remove a ")}{label} {localize(locale, "of", "de", "de")}{" "}
+              {pendingDeletion ? formatCurrency(pendingDeletion.amount) : ""} {localize(locale, "from the current shift. Enter a reason to preserve the closing audit trail.", "del turno actual. Introduce un motivo para conservar la auditoría del cierre.", "do turno atual. Informe o motivo para preservar a auditoria do fechamento.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <label className="audit-justification-field">
             <span>
-              {locale === "en" ? "Deletion reason" : "Justificativa da exclusão"} <b>{locale === "en" ? "required" : "obrigatória"}</b>
+              {localize(locale, "Deletion reason", "Motivo de eliminación", "Justificativa da exclusão")} <b>{localize(locale, "required", "obligatorio", "obrigatória")}</b>
             </span>
             <textarea
               value={deletionJustification}
               maxLength={240}
-              placeholder={locale === "en" ? "E.g.: duplicate entry or incorrectly recorded amount." : "Ex.: lançamento duplicado ou valor lançado incorretamente."}
+              placeholder={localize(locale, "E.g.: duplicate entry or incorrectly recorded amount.", "Ej.: movimiento duplicado o importe registrado incorrectamente.", "Ex.: lançamento duplicado ou valor lançado incorretamente.")}
               onChange={event => setDeletionJustification(event.target.value)}
             />
           </label>
           <AlertDialogFooter>
-            <AlertDialogCancel>{locale === "en" ? "Cancel" : "Cancelar"}</AlertDialogCancel>
+            <AlertDialogCancel>{locale === "en" ? "Cancel" : locale === "es" ? "Cancelar" : "Cancelar"}</AlertDialogCancel>
             <AlertDialogAction
               className="history-delete-confirm"
               onClick={event => {
@@ -1968,7 +2009,7 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
                 confirmDeletion();
               }}
             >
-              {locale === "en" ? "Delete entry" : "Excluir lançamento"}
+              {localize(locale, "Delete entry", "Eliminar movimiento", "Excluir lançamento")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1984,14 +2025,14 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
       >
         <DialogContent className="history-dialog">
           <DialogHeader>
-            <DialogTitle>{locale === "en" ? `Edit ${label}` : `Editar ${label}`}</DialogTitle>
+            <DialogTitle>{locale === "en" ? `Edit ${label}` : locale === "es" ? `Editar ${label}` : `Editar ${label}`}</DialogTitle>
             <DialogDescription>
-              {locale === "en" ? "Adjust the amount, time, and description. The reason will be included in the audit history." : "Ajuste o valor, o horário e a identificação. A justificativa será incluída no histórico de auditoria."}
+              {locale === "en" ? "Adjust the amount, time, and description. The reason will be included in the audit history." : locale === "es" ? "Ajusta el importe, la hora y la descripción. El motivo se incluirá en el historial de auditoría." : "Ajuste o valor, o horário e a identificação. A justificativa será incluída no histórico de auditoria."}
             </DialogDescription>
           </DialogHeader>
           <div className="edit-adjustment-fields">
             <label className="amount-input">
-              <span>{locale === "en" ? "Amount" : "Valor"}</span>
+              <span>{localize(locale, "Amount", "Importe", "Valor")}</span>
               <div>
                 <b>R$</b>
                 <input
@@ -2005,7 +2046,7 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
               </div>
             </label>
             <label className="edit-time-input">
-              <span>{locale === "en" ? "Time" : "Horário"}</span>
+              <span>{localize(locale, "Time", "Hora", "Horário")}</span>
               <input
                 type="time"
                 value={editingTime}
@@ -2014,7 +2055,7 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
             </label>
             <label className="adjustment-note-input edit-note-input">
               <span>
-                {locale === "en" ? "Description" : "Identificação"} <small>{locale === "en" ? "optional" : "opcional"}</small>
+                {localize(locale, "Description", "Descripción", "Identificação")} <small>{localize(locale, "optional", "opcional", "opcional")}</small>
               </span>
               <input
                 maxLength={48}
@@ -2025,12 +2066,12 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
           </div>
           <label className="audit-justification-field">
             <span>
-              {locale === "en" ? "Change reason" : "Justificativa da alteração"} <b>{locale === "en" ? "required" : "obrigatória"}</b>
+              {localize(locale, "Change reason", "Motivo del cambio", "Justificativa da alteração")} <b>{localize(locale, "required", "obligatorio", "obrigatória")}</b>
             </span>
             <textarea
               value={editingJustification}
               maxLength={240}
-              placeholder={locale === "en" ? "E.g.: correction after checking the amount or time." : "Ex.: correção após conferência do valor ou horário."}
+              placeholder={localize(locale, "E.g.: correction after checking the amount or time.", "Ej.: corrección después de verificar el importe o la hora.", "Ex.: correção após conferência do valor ou horário.")}
               onChange={event => setEditingJustification(event.target.value)}
             />
           </label>
@@ -2040,14 +2081,14 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
               variant="outline"
               onClick={() => setEditingEntry(null)}
             >
-              {locale === "en" ? "Cancel" : "Cancelar"}
+              {locale === "en" ? "Cancel" : locale === "es" ? "Cancelar" : "Cancelar"}
             </Button>
             <Button
               type="button"
               className="pixbee-primary-button history-save-button"
               onClick={saveEdit}
             >
-              {locale === "en" ? "Save changes" : "Salvar alterações"}
+              {locale === "en" ? "Save changes" : locale === "es" ? "Guardar cambios" : "Salvar alterações"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2218,18 +2259,16 @@ export function CashEntryWorkspace() {
           <Plus size={19} />
         </span>
         <div>
-          <strong>{locale === "en" ? "Add cash entry" : "Adicionar entrada em espécie"}</strong>
+          <strong>{localize(locale, "Add cash entry", "Añadir entrada de efectivo", "Adicionar entrada em espécie")}</strong>
           <small>
-            {locale === "en"
-              ? "Each amount is added to expected cash. Press Enter to record it quickly."
-              : "Cada valor é somado ao esperado em dinheiro. Pressione Enter para registrar rapidamente."}
+            {localize(locale, "Each amount is added to expected cash. Press Enter to record it quickly.", "Cada importe se añade al efectivo esperado. Pulsa Enter para registrarlo rápidamente.", "Cada valor é somado ao esperado em dinheiro. Pressione Enter para registrar rapidamente.")}
           </small>
         </div>
         <b>{formatCurrency(session.expected.cash)}</b>
       </header>
       <div className="adjustment-form">
         <label className="amount-input">
-          <span>{locale === "en" ? "Amount received" : "Valor recebido"}</span>
+          <span>{localize(locale, "Amount received", "Importe recibido", "Valor recebido")}</span>
           <div>
             <b>R$</b>
             <input
@@ -2249,16 +2288,20 @@ export function CashEntryWorkspace() {
           type="button"
           onClick={startEntry}
         >
-          <Plus size={17} /> {locale === "en" ? "Add entry" : "Adicionar entrada"}
+          <Plus size={17} /> {localize(locale, "Add entry", "Añadir entrada", "Adicionar entrada")}
         </Button>
       </div>
       <div className="adjustment-history">
         <div>
-          <span>{locale === "en" ? "Entries recorded this shift" : "Entradas registradas neste turno"}</span>
+          <span>{localize(locale, "Entries recorded this shift", "Entradas registradas en este turno", "Entradas registradas neste turno")}</span>
           <small>
             {entries.length === 0
-              ? locale === "en" ? "No entries recorded." : "Nenhuma entrada registrada."
-              : locale === "en" ? `${entries.length} cash entr${entries.length > 1 ? "ies" : "y"} recorded.` : `${entries.length} entrada${entries.length > 1 ? "s" : ""} somada${entries.length > 1 ? "s" : ""}.`}
+              ? localize(locale, "No entries recorded.", "No hay entradas registradas.", "Nenhuma entrada registrada.")
+              : locale === "en"
+                ? `${entries.length} cash entr${entries.length > 1 ? "ies" : "y"} recorded.`
+                : locale === "es"
+                  ? `${entries.length} entrada${entries.length > 1 ? "s" : ""} registrada${entries.length > 1 ? "s" : ""}.`
+                  : `${entries.length} entrada${entries.length > 1 ? "s" : ""} somada${entries.length > 1 ? "s" : ""}.`}
           </small>
         </div>
         {entries.map(entry => (
@@ -2267,7 +2310,7 @@ export function CashEntryWorkspace() {
               {formatShortTime(entry.createdAt)}
             </time>
             <span>
-              <strong>{locale === "en" ? "Cash entry" : "Entrada em dinheiro"}</strong>
+              <strong>{locale === "en" ? "Cash entry" : locale === "es" ? "Entrada de efectivo" : "Entrada em dinheiro"}</strong>
               <small>
                 {locale === "en" ? "Received" : "Recebido"} {formatCurrency(getGrossAmount(entry))}
                 {getChangeAmount(entry) > 0
@@ -2294,28 +2337,28 @@ export function CashEntryWorkspace() {
         initialQuantities={entryQuantities}
         onOpenChange={setIsEntryCountOpen}
         onConfirm={confirmReceivedQuantities}
-        title={locale === "en" ? "Count the cash received" : "Conte o dinheiro recebido"}
-        description={locale === "en" ? `Record the notes and coins totaling ${formatCurrency(grossAmount)}. This composition will be added to the physical cash.` : `Registre as cédulas e moedas que totalizam ${formatCurrency(grossAmount)}. Essa composição será adicionada ao caixa físico.`}
-        summaryLabel={locale === "en" ? "Counted cash received" : "Dinheiro recebido apurado"}
-        confirmLabel={locale === "en" ? "Confirm cash received" : "Confirmar dinheiro recebido"}
+        title={localize(locale, "Count the cash received", "Cuenta el efectivo recibido", "Conte o dinheiro recebido")}
+        description={localize(locale, `Record the notes and coins totaling ${formatCurrency(grossAmount)}. This composition will be added to the physical cash.`, `Registra los billetes y monedas que suman ${formatCurrency(grossAmount)}. Esta composición se añadirá al efectivo físico.`, `Registre as cédulas e moedas que totalizam ${formatCurrency(grossAmount)}. Essa composição será adicionada ao caixa físico.`)}
+        summaryLabel={localize(locale, "Counted cash received", "Efectivo recibido contado", "Dinheiro recebido apurado")}
+        confirmLabel={localize(locale, "Confirm cash received", "Confirmar efectivo recibido", "Confirmar dinheiro recebido")}
       />
       <Dialog open={isChangeQuestionOpen} onOpenChange={setIsChangeQuestionOpen}>
         <DialogContent className="change-dialog">
           <DialogHeader>
-            <DialogTitle>{locale === "en" ? "Did this entry include change?" : "Essa entrada teve troco?"}</DialogTitle>
+            <DialogTitle>{localize(locale, "Did this entry include change?", "¿Esta entrada incluyó cambio?", "Essa entrada teve troco?")}</DialogTitle>
             <DialogDescription>
-              {locale === "en" ? `You received ${formatCurrency(grossAmount)}. Tell us whether part of this amount was returned to the customer before recording the entry.` : `Você recebeu ${formatCurrency(grossAmount)}. Informe se parte desse valor voltou para o cliente antes de registrar a entrada.`}
+              {localize(locale, `You received ${formatCurrency(grossAmount)}. Tell us whether part of this amount was returned to the customer before recording the entry.`, `Recibiste ${formatCurrency(grossAmount)}. Indica si una parte de este importe se devolvió a la persona cliente antes de registrar la entrada.`, `Você recebeu ${formatCurrency(grossAmount)}. Informe se parte desse valor voltou para o cliente antes de registrar a entrada.`)}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setIsChangeQuestionOpen(false)}>
-              {locale === "en" ? "Cancel" : "Cancelar"}
+              {locale === "en" ? "Cancel" : locale === "es" ? "Cancelar" : "Cancelar"}
             </Button>
             <Button type="button" variant="secondary" onClick={() => answerHasChange(false)}>
-              {locale === "en" ? "No change" : "Não teve troco"}
+              {localize(locale, "No change", "Sin cambio", "Não teve troco")}
             </Button>
             <Button type="button" className="pixbee-primary-button" onClick={() => answerHasChange(true)}>
-              {locale === "en" ? "Yes, enter change" : "Sim, informar troco"}
+              {localize(locale, "Yes, enter change", "Sí, informar cambio", "Sim, informar troco")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2323,21 +2366,21 @@ export function CashEntryWorkspace() {
       <Dialog open={isChangeCountOpen} onOpenChange={setIsChangeCountOpen}>
         <DialogContent className="money-count-dialog">
           <DialogHeader>
-            <DialogTitle>{editingEntry ? locale === "en" ? "Correct returned change" : "Corrija o troco devolvido" : locale === "en" ? "Count the returned change" : "Conte o troco devolvido"}</DialogTitle>
+            <DialogTitle>{editingEntry ? localize(locale, "Correct returned change", "Corrige el cambio devuelto", "Corrija o troco devolvido") : localize(locale, "Count the returned change", "Cuenta el cambio devuelto", "Conte o troco devolvido")}</DialogTitle>
             <DialogDescription>
               {editingEntry
-                ? locale === "en" ? "The previous composition was imported. Adjust the returned notes and coins according to the cash available." : "A composição anterior foi importada. Ajuste as notas e moedas devolvidas conforme o caixa disponível."
-                : locale === "en" ? "The available composition was imported. Enter the returned notes and coins below. The system will calculate the net entry automatically." : "A composição disponível foi importada. Registre abaixo as notas e moedas devolvidas. O sistema calculará a entrada líquida automaticamente."}
+                ? localize(locale, "The previous composition was imported. Adjust the returned notes and coins according to the cash available.", "La composición anterior fue importada. Ajusta los billetes y monedas devueltos según el efectivo disponible.", "A composição anterior foi importada. Ajuste as notas e moedas devolvidas conforme o caixa disponível.")
+                : localize(locale, "The available composition was imported. Enter the returned notes and coins below. The system will calculate the net entry automatically.", "La composición disponible fue importada. Registra abajo los billetes y monedas devueltos. El sistema calculará automáticamente la entrada neta.", "A composição disponível foi importada. Registre abaixo as notas e moedas devolvidas. O sistema calculará a entrada líquida automaticamente.")}
             </DialogDescription>
           </DialogHeader>
           <div className="change-summary-grid">
-            <div><span>{locale === "en" ? "Received" : "Recebido"}</span><strong>{formatCurrency(grossAmount)}</strong></div>
-            <div><span>{locale === "en" ? "Change returned" : "Troco devolvido"}</span><strong>{formatCurrency(changeAmount)}</strong></div>
-            <div className="net"><span>{locale === "en" ? "Net entry" : "Entrada líquida"}</span><strong>{formatCurrency(getNetCashEntryAmount(grossAmount, changeAmount))}</strong></div>
+            <div><span>{localize(locale, "Received", "Recibido", "Recebido")}</span><strong>{formatCurrency(grossAmount)}</strong></div>
+            <div><span>{localize(locale, "Change returned", "Cambio devuelto", "Troco devolvido")}</span><strong>{formatCurrency(changeAmount)}</strong></div>
+            <div className="net"><span>{locale === "en" ? "Net entry" : locale === "es" ? "Entrada neta" : "Entrada líquida"}</span><strong>{formatCurrency(getNetCashEntryAmount(grossAmount, changeAmount))}</strong></div>
           </div>
           <div className="money-count-columns">
             <section>
-              <div className="denomination-heading"><span><Banknote size={16} /> Cédulas</span></div>
+              <div className="denomination-heading"><span><Banknote size={16} /> {localize(locale, "Notes", "Billetes", "Cédulas")}</span></div>
               {NOTE_DENOMINATIONS.map(item => (
                 <QuantityControl key={item.key} item={item} quantity={changeQuantities[item.key] ?? 0}
                     available={availableQuantities[item.key] ?? 0}
@@ -2351,7 +2394,7 @@ export function CashEntryWorkspace() {
               ))}
             </section>
             <section>
-              <div className="denomination-heading"><span><Coins size={16} /> Moedas</span></div>
+              <div className="denomination-heading"><span><Coins size={16} /> {localize(locale, "Coins", "Monedas", "Moedas")}</span></div>
               {COIN_DENOMINATIONS.map(item => (
                 <QuantityControl key={item.key} item={item} quantity={changeQuantities[item.key] ?? 0}
                     available={availableQuantities[item.key] ?? 0}
@@ -2374,7 +2417,7 @@ export function CashEntryWorkspace() {
                 setEditingEntry(null);
                 setAmount("");
               }}
-            >{locale === "en" ? "Back" : "Voltar"}</Button>
+            >{locale === "en" ? "Back" : locale === "es" ? "Atrás" : "Voltar"}</Button>
             <Button
               type="button"
               className="pixbee-primary-button"
@@ -2384,7 +2427,7 @@ export function CashEntryWorkspace() {
                   : saveEntry(changeAmount, changeQuantities)
               }
             >
-              {editingEntry ? locale === "en" ? "Save correction" : "Salvar correção" : locale === "en" ? "Confirm net entry" : "Confirmar entrada líquida"} <ArrowRight size={17} />
+              {editingEntry ? locale === "en" ? "Save correction" : locale === "es" ? "Guardar corrección" : "Salvar correção" : locale === "en" ? "Confirm net entry" : locale === "es" ? "Confirmar entrada neta" : "Confirmar entrada líquida"} <ArrowRight size={17} />
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2479,7 +2522,7 @@ function CountPage() {
       session.adjustments.length > 0;
     if (!hasAnyValue) {
       toast.error(
-        locale === "en" ? "Record at least one counted amount before reviewing the closing." : "Registre ao menos um valor conferido antes de revisar o fechamento."
+        locale === "en" ? "Record at least one counted amount before reviewing the closing." : locale === "es" ? "Registra al menos un importe contado antes de revisar el cierre." : "Registre ao menos um valor conferido antes de revisar o fechamento."
       );
       return;
     }
@@ -2497,24 +2540,24 @@ function CountPage() {
       <Dialog open={isDeadlineDialogOpen} onOpenChange={() => undefined}>
         <DialogContent className="deadline-dialog" onEscapeKeyDown={event => event.preventDefault()} onPointerDownOutside={event => event.preventDefault()}>
           <DialogHeader>
-            <DialogTitle>{session.closureRequired ? locale === "en" ? "Mandatory closing" : "Fechamento obrigatório" : locale === "en" ? "The shift has ended" : "O turno chegou ao fim"}</DialogTitle>
+            <DialogTitle>{session.closureRequired ? locale === "en" ? "Mandatory closing" : locale === "es" ? "Cierre obligatorio" : "Fechamento obrigatório" : locale === "en" ? "The shift has ended" : "O turno chegou ao fim"}</DialogTitle>
             <DialogDescription>
               {session.closureRequired
                 ? locale === "en" ? "The additional time has been used. Validate the closing to continue and open a new count." : "O prazo adicional já foi utilizado. Valide o fechamento para continuar e abrir uma nova contagem."
-                : locale === "en" ? "The selected period has ended. You can start closing now or use one extension." : "O período selecionado terminou. Você pode iniciar o fechamento agora ou usar uma única extensão."
+                : locale === "en" ? "The selected period has ended. You can start closing now or use one extension." : locale === "es" ? "El período seleccionado terminó. Puedes iniciar el cierre ahora o usar una única extensión." : "O período selecionado terminou. Você pode iniciar o fechamento agora ou usar uma única extensão."
               }
             </DialogDescription>
           </DialogHeader>
           {!session.closureRequired && !session.extensionUsed ? (
             <div className="deadline-options">
-              <Button type="button" variant="outline" onClick={() => extendShift(20)}>{locale === "en" ? "Add 20 min" : "Adicionar 20 min"}</Button>
-              <Button type="button" variant="outline" onClick={() => extendShift(30)}>{locale === "en" ? "Add 30 min" : "Adicionar 30 min"}</Button>
-              <Button type="button" variant="outline" onClick={() => extendShift(60)}>{locale === "en" ? "Add 1 hour" : "Adicionar 1 hora"}</Button>
+              <Button type="button" variant="outline" onClick={() => extendShift(20)}>{locale === "en" ? "Add 20 min" : locale === "es" ? "Añadir 20 min" : "Adicionar 20 min"}</Button>
+              <Button type="button" variant="outline" onClick={() => extendShift(30)}>{locale === "en" ? "Add 30 min" : locale === "es" ? "Añadir 30 min" : "Adicionar 30 min"}</Button>
+              <Button type="button" variant="outline" onClick={() => extendShift(60)}>{locale === "en" ? "Add 1 hour" : locale === "es" ? "Añadir 1 hora" : "Adicionar 1 hora"}</Button>
             </div>
           ) : null}
           <DialogFooter>
             <Button type="button" className="pixbee-primary-button" onClick={startMandatoryClosing}>
-              {locale === "en" ? "Start closing" : "Iniciar fechamento"} <ArrowRight size={17} />
+              {locale === "en" ? "Start closing" : locale === "es" ? "Iniciar cierre" : "Iniciar fechamento"} <ArrowRight size={17} />
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2523,10 +2566,10 @@ function CountPage() {
         <div className="mandatory-closure-lock" role="alert">
           <div className="mandatory-closure-lock-card">
             <Clock3 size={24} />
-            <strong>{locale === "en" ? "Mandatory closing" : "Fechamento obrigatório"}</strong>
-            <span>{locale === "en" ? "This shift's deadline has ended. Validate the drawer to unlock a new count." : "O prazo deste turno terminou. Valide o caixa para liberar uma nova contagem."}</span>
+            <strong>{locale === "en" ? "Mandatory closing" : locale === "es" ? "Cierre obligatorio" : "Fechamento obrigatório"}</strong>
+            <span>{locale === "en" ? "This shift's deadline has ended. Validate the drawer to unlock a new count." : locale === "es" ? "El plazo de este turno terminó. Valida la caja para habilitar un nuevo conteo." : "O prazo deste turno terminou. Valide o caixa para liberar uma nova contagem."}</span>
             <Button className="pixbee-primary-button" onClick={() => navigate("/validacao")}>
-              {locale === "en" ? "Go to validation" : "Ir para validação"} <ArrowRight size={17} />
+              {locale === "en" ? "Go to validation" : locale === "es" ? "Ir a validación" : "Ir para validação"} <ArrowRight size={17} />
             </Button>
           </div>
         </div>
@@ -2534,30 +2577,30 @@ function CountPage() {
       <div className="count-layout">
         <section className="glass-panel flow-panel count-panel">
           <div className="flow-heading compact">
-            <span>{locale === "en" ? "Step 02" : t("count.step")}</span>
-            <h2>{locale === "en" ? "Record the shift values." : t("count.title")}</h2>
-            <p>{locale === "en" ? "Expected values are compared with the amounts actually counted." : t("count.copy")}</p>
+            <span>{locale === "en" ? "Step 02" : locale === "es" ? "Etapa 02" : t("count.step")}</span>
+            <h2>{locale === "en" ? "Record the shift values." : locale === "es" ? "Registra los valores del turno." : t("count.title")}</h2>
+            <p>{locale === "en" ? "Expected values are compared with the amounts actually counted." : locale === "es" ? "Los valores esperados se comparan con los importes contados." : t("count.copy")}</p>
           </div>
           {cashSelected && (
             <section className="count-section">
               <div className="section-title">
                 <div>
                   <Banknote size={19} />
-                  <span>{locale === "en" ? "Physical cash" : "Dinheiro físico"}</span>
+                  <span>{locale === "en" ? "Physical cash" : locale === "es" ? "Efectivo" : "Dinheiro físico"}</span>
                 </div>
                 <strong>{formatCurrency(computed.cashFound)}</strong>
               </div>
               <div className="cash-expected-grid">
                 <div className="opening-amount">
-                  <span>{locale === "en" ? "Opening float" : "Fundo inicial"}</span>
+                  <span>{locale === "en" ? "Opening float" : locale === "es" ? "Fondo inicial" : "Fundo inicial"}</span>
                   <strong>{formatCurrency(session.openingFloat ?? 0)}</strong>
                 </div>
                 <div className="opening-amount">
-                  <span>{locale === "en" ? "Accumulated entries" : "Entradas acumuladas"}</span>
+                  <span>{locale === "en" ? "Accumulated entries" : locale === "es" ? "Ingresos acumulados" : "Entradas acumuladas"}</span>
                   <strong>{formatCurrency(session.expected.cash)}</strong>
                 </div>
                 <div className="opening-amount total">
-                  <span>{locale === "en" ? "Expected cash" : "Esperado em espécie"}</span>
+                  <span>{locale === "en" ? "Expected cash" : locale === "es" ? "Efectivo esperado" : "Esperado em espécie"}</span>
                   <strong>{formatCurrency(computed.cashExpected)}</strong>
                 </div>
               </div>
@@ -2566,7 +2609,7 @@ function CountPage() {
                 <div>
                   <div className="denomination-heading">
                     <span>
-                      <Banknote size={16} /> {locale === "en" ? "Notes" : "Cédulas"}
+                      <Banknote size={16} /> {locale === "en" ? "Notes" : locale === "es" ? "Billetes" : "Cédulas"}
                     </span>
                     <strong>{formatCurrency(computed.notes)}</strong>
                   </div>
@@ -2577,7 +2620,7 @@ function CountPage() {
                 <div>
                   <div className="denomination-heading">
                     <span>
-                      <Coins size={16} /> {locale === "en" ? "Coins" : "Moedas"}
+                      <Coins size={16} /> {locale === "en" ? "Coins" : locale === "es" ? "Monedas" : "Moedas"}
                     </span>
                     <strong>{formatCurrency(computed.coins)}</strong>
                   </div>
@@ -2593,7 +2636,7 @@ function CountPage() {
               <div className="section-title">
                 <div>
                   <WalletCards size={19} />
-                  <span>{locale === "en" ? "Digital payments" : "Recebimentos digitais"}</span>
+                  <span>{locale === "en" ? "Digital payments" : locale === "es" ? "Pagos digitales" : "Recebimentos digitais"}</span>
                 </div>
                 <strong>{formatCurrency(computed.digitalFound)}</strong>
               </div>
@@ -2613,12 +2656,12 @@ function CountPage() {
                         <small>{locale === "en" ? ENGLISH_METHOD_INFO[method].description : info.description}</small>
                       </div>
                       <AmountInput
-                        label={locale === "en" ? "Expected" : "Esperado"}
+                        label={locale === "en" ? "Expected" : locale === "es" ? "Esperado" : "Esperado"}
                         value={session.expected[method]}
                         onChange={value => updateExpected(method, value)}
                       />
                       <AmountInput
-                        label={locale === "en" ? "Counted" : "Conferido"}
+                        label={locale === "en" ? "Counted" : locale === "es" ? "Contado" : "Conferido"}
                         value={session.confirmed[method]}
                         onChange={value => updateConfirmed(method, value)}
                       />
@@ -2633,7 +2676,7 @@ function CountPage() {
               <div className="section-title">
                 <div>
                   <ReceiptText size={19} />
-                  <span>{locale === "en" ? "Cash movements" : "Lançamentos de caixa"}</span>
+                  <span>{locale === "en" ? "Cash movements" : locale === "es" ? "Movimientos de caja" : "Lançamentos de caixa"}</span>
                 </div>
                 <small>
                   {locale === "en"
@@ -2652,38 +2695,38 @@ function CountPage() {
           )}
           <div className="flow-actions">
             <Link href="/abertura" className="pixbee-text-button">
-              <ArrowLeft size={17} /> {locale === "en" ? "Back" : "Voltar"}
+              <ArrowLeft size={17} /> {locale === "en" ? "Back" : locale === "es" ? "Atrás" : "Voltar"}
             </Link>
             <Button
               className="pixbee-primary-button"
               onClick={moveToValidation}
             >
-              {locale === "en" ? "Review closing" : "Revisar fechamento"} <ArrowRight size={18} />
+              {locale === "en" ? "Review closing" : locale === "es" ? "Revisar cierre" : "Revisar fechamento"} <ArrowRight size={18} />
             </Button>
           </div>
         </section>
         <aside className="count-summary glass-panel">
-          <span>{locale === "en" ? "Live summary" : "Resumo em tempo real"}</span>
+          <span>{locale === "en" ? "Live summary" : locale === "es" ? "Resumen en tiempo real" : "Resumo em tempo real"}</span>
           <div className="summary-total">
-            <small>{locale === "en" ? "Total counted" : "Total conferido"}</small>
+            <small>{locale === "en" ? "Total counted" : locale === "es" ? "Total contado" : "Total conferido"}</small>
             <strong>{formatCurrency(computed.totalFound)}</strong>
           </div>
           <div className="summary-line">
-            <span>{locale === "en" ? "Expected amount" : "Valor esperado"}</span>
+            <span>{locale === "en" ? "Expected amount" : locale === "es" ? "Importe esperado" : "Valor esperado"}</span>
             <strong>{formatCurrency(computed.totalExpected)}</strong>
           </div>
           <div className="summary-line">
-            <span>{locale === "en" ? "Physical cash" : "Dinheiro físico"}</span>
+            <span>{locale === "en" ? "Physical cash" : locale === "es" ? "Efectivo" : "Dinheiro físico"}</span>
             <strong>{formatCurrency(computed.cashFound)}</strong>
           </div>
           <div className="summary-line">
-            <span>{locale === "en" ? "Withdrawals" : "Sangrias"}</span>
+            <span>{locale === "en" ? "Withdrawals" : locale === "es" ? "Retiros" : "Sangrias"}</span>
             <strong>
               - {formatCurrency(computed.adjustmentTotals.withdrawal)}
             </strong>
           </div>
           <div className="summary-line">
-            <span>{locale === "en" ? "Supplies" : "Suprimentos"}</span>
+            <span>{locale === "en" ? "Supplies" : locale === "es" ? "Ingresos" : "Suprimentos"}</span>
             <strong>
               + {formatCurrency(computed.adjustmentTotals.supply)}
             </strong>
@@ -2691,16 +2734,14 @@ function CountPage() {
           <div
             className={`summary-difference ${Math.abs(computed.difference) < 0.005 ? "balanced" : computed.difference > 0 ? "positive" : "negative"}`}
           >
-            <span>{locale === "en" ? "Difference so far" : "Diferença até agora"}</span>
+            <span>{locale === "en" ? "Difference so far" : locale === "es" ? "Diferencia hasta ahora" : "Diferença até agora"}</span>
             <strong>
               {computed.difference > 0 ? "+" : ""}
               {formatCurrency(computed.difference)}
             </strong>
           </div>
           <p>
-            {locale === "en"
-              ? "Continue entering values. The difference breakdown appears in the final step."
-              : "Continue preenchendo. O detalhamento da diferença aparece na etapa final."}
+            {localize(locale, "Continue entering values. The difference breakdown appears in the final step.", "Continúa registrando valores. El detalle de la diferencia aparece en la etapa final.", "Continue preenchendo. O detalhamento da diferença aparece na etapa final.")}
           </p>
         </aside>
       </div>
@@ -2751,7 +2792,7 @@ export function ValidationPage() {
       ? [
           {
             method: "cash" as MethodId,
-            label: locale === "en" ? "Physical cash" : "Dinheiro físico",
+            label: locale === "en" ? "Physical cash" : locale === "es" ? "Efectivo" : "Dinheiro físico",
             expected: cashExpected,
             found: cashFound,
           },
@@ -2775,7 +2816,9 @@ export function ValidationPage() {
   const balanced = Math.abs(difference) < 0.005;
   const localizedClosureStatus = locale === "en"
     ? balanced ? "balanced" : difference > 0 ? "surplus" : "shortage"
-    : balanced ? "sem quebra" : difference > 0 ? "sobra" : "falta";
+    : locale === "es"
+      ? balanced ? "sin diferencia" : difference > 0 ? "sobrante" : "faltante"
+      : balanced ? "sem quebra" : difference > 0 ? "sobra" : "falta";
   const closureStatus: "SEM QUEBRA" | "SOBRA" | "FALTA" = balanced
     ? "SEM QUEBRA"
     : difference > 0
@@ -2819,7 +2862,7 @@ export function ValidationPage() {
     }));
     toast.success(
               balanced
-        ? locale === "en" ? "Closing reconciled and saved to local history." : "Fechamento conciliado e registrado no histórico local."
+        ? locale === "en" ? "Closing reconciled and saved to local history." : locale === "es" ? "Cierre conciliado y guardado en el historial local." : "Fechamento conciliado e registrado no histórico local."
         : locale === "en" ? `Closing validated with a ${localizedClosureStatus} of ${formatCurrency(Math.abs(difference))}.` : `Fechamento validado com ${closureStatus.toLowerCase()} de ${formatCurrency(Math.abs(difference))}.`
 
     );
@@ -2842,7 +2885,7 @@ export function ValidationPage() {
   }
   return (
     <>
-      <AppShell title={locale === "en" ? "Closing validation" : "Validação do fechamento"} currentStep={4}>
+      <AppShell title={locale === "en" ? "Closing validation" : locale === "es" ? "Validación del cierre" : "Validação do fechamento"} currentStep={4}>
         <section className="glass-panel validation-panel">
           <div className="validation-heading">
             <span
@@ -2855,32 +2898,28 @@ export function ValidationPage() {
               )}
             </span>
             <div>
-              <span>{locale === "en" ? "Step 03" : "Etapa 03"}</span>
+              <span>{locale === "en" ? "Step 03" : locale === "es" ? "Etapa 03" : "Etapa 03"}</span>
               <h2>
                 {balanced
-                  ? locale === "en" ? "Cash drawer reconciled" : "Caixa conciliado"
+                  ? locale === "en" ? "Cash drawer reconciled" : locale === "es" ? "Caja conciliada" : "Caixa conciliado"
                   : difference > 0
-                    ? locale === "en" ? "Closing with surplus" : "Fechamento com sobra"
-                    : locale === "en" ? "Closing with shortage" : "Fechamento com falta"}
+                    ? locale === "en" ? "Closing with surplus" : locale === "es" ? "Cierre con sobrante" : "Fechamento com sobra"
+                    : locale === "en" ? "Closing with shortage" : locale === "es" ? "Cierre con faltante" : "Fechamento com falta"}
               </h2>
               <p>
                 {balanced
-                  ? locale === "en"
-                    ? "The counted amounts match the expected total for this shift."
-                    : "Os valores encontrados correspondem ao total esperado para este turno."
-                  : locale === "en"
-                    ? "The discrepancy will be recorded in history and on the receipt. You can complete the closing normally."
-                    : "A quebra será registrada no histórico e no comprovante. Você pode concluir o fechamento normalmente."}
+                  ? localize(locale, "The counted amounts match the expected total for this shift.", "Los importes contados coinciden con el total esperado para este turno.", "Os valores encontrados correspondem ao total esperado para este turno.")
+                  : localize(locale, "The discrepancy will be recorded in history and on the receipt. You can complete the closing normally.", "La diferencia se registrará en el historial y en el comprobante. Puedes completar el cierre normalmente.", "A quebra será registrada no histórico e no comprovante. Você pode concluir o fechamento normalmente.")}
               </p>
             </div>
           </div>
           <div className="validation-totals">
             <article>
-              <span>{locale === "en" ? "Expected at closing" : "Esperado no fechamento"}</span>
+              <span>{locale === "en" ? "Expected at closing" : locale === "es" ? "Esperado al cerrar" : "Esperado no fechamento"}</span>
               <strong>{formatCurrency(totalExpected)}</strong>
             </article>
             <article>
-              <span>{locale === "en" ? "Counted at reconciliation" : "Encontrado na conferência"}</span>
+              <span>{locale === "en" ? "Counted at reconciliation" : locale === "es" ? "Contado en la conciliación" : "Encontrado na conferência"}</span>
               <strong>{formatCurrency(totalFound)}</strong>
             </article>
             <article
@@ -2888,7 +2927,7 @@ export function ValidationPage() {
                 balanced ? "balanced" : difference > 0 ? "positive" : "negative"
               }
             >
-              <span>{locale === "en" ? "Overall difference" : "Divergência geral"}</span>
+              <span>{locale === "en" ? "Overall difference" : locale === "es" ? "Diferencia general" : "Divergência geral"}</span>
               <strong>
                 {difference > 0 ? "+" : ""}
                 {formatCurrency(difference)}
@@ -2897,10 +2936,10 @@ export function ValidationPage() {
           </div>
           <div className="variation-table">
             <div className="variation-head">
-              <span>{locale === "en" ? "Method" : "Modalidade"}</span>
-              <span>{locale === "en" ? "Expected" : "Esperado"}</span>
-              <span>{locale === "en" ? "Counted" : "Conferido"}</span>
-              <span>{locale === "en" ? "Difference" : "Diferença"}</span>
+              <span>{locale === "en" ? "Method" : locale === "es" ? "Modalidad" : "Modalidade"}</span>
+              <span>{locale === "en" ? "Expected" : locale === "es" ? "Esperado" : "Esperado"}</span>
+              <span>{locale === "en" ? "Counted" : locale === "es" ? "Contado" : "Conferido"}</span>
+              <span>{locale === "en" ? "Difference" : locale === "es" ? "Diferencia" : "Diferença"}</span>
             </div>
             {variations.map(item => (
               <div className="variation-row" key={item.method}>
@@ -2938,8 +2977,8 @@ export function ValidationPage() {
               <div className="adjustment-note">
                 <ReceiptText size={18} />
                 <span>
-                  <strong>{locale === "en" ? "Movements included in physical cash:" : "Lançamentos considerados no dinheiro físico:"}</strong>{" "}
-                  {locale === "en" ? `withdrawals of ${formatCurrency(adjustmentTotals.withdrawal)} and supplies of ${formatCurrency(adjustmentTotals.supply)}.` : `sangrias de ${formatCurrency(adjustmentTotals.withdrawal)} e suprimentos de ${formatCurrency(adjustmentTotals.supply)}.`}
+                  <strong>{localize(locale, "Movements included in physical cash:", "Movimientos incluidos en el efectivo físico:", "Lançamentos considerados no dinheiro físico:")}</strong>{" "}
+                  {localize(locale, `withdrawals of ${formatCurrency(adjustmentTotals.withdrawal)} and supplies of ${formatCurrency(adjustmentTotals.supply)}.`, `retiros de ${formatCurrency(adjustmentTotals.withdrawal)} e ingresos de ${formatCurrency(adjustmentTotals.supply)}.`, `sangrias de ${formatCurrency(adjustmentTotals.withdrawal)} e suprimentos de ${formatCurrency(adjustmentTotals.supply)}.`)}
                 </span>
               </div>
               <div className="adjustment-review-list">
@@ -2947,7 +2986,7 @@ export function ValidationPage() {
                   <div key={entry.id}>
                     <time>{formatShortTime(entry.createdAt)}</time>
                     <span>
-                      {entry.type === "withdrawal" ? locale === "en" ? "Withdrawal" : "Sangria" : locale === "en" ? "Supply" : "Suprimento"}
+                      {entry.type === "withdrawal" ? localize(locale, "Withdrawal", "Retiro", "Sangria") : localize(locale, "Supply", "Ingreso", "Suprimento")}
                       {entry.note ? ` · ${entry.note}` : ""}
                     </span>
                     <strong
@@ -2966,7 +3005,7 @@ export function ValidationPage() {
           {!balanced && (
             <label className="closure-note">
               <span>
-                {locale === "en" ? "Notes about the discrepancy" : "Observação sobre a quebra"} <b>{locale === "en" ? "recommended" : "recomendado"}</b>
+                {localize(locale, "Notes about the discrepancy", "Observaciones sobre la diferencia", "Observação sobre a quebra")} <b>{localize(locale, "recommended", "recomendado", "recomendado")}</b>
               </span>
               <textarea
                 value={session.closureNote}
@@ -2977,7 +3016,7 @@ export function ValidationPage() {
                   }))
                 }
                 rows={3}
-                placeholder={locale === "en" ? "E.g.: difference identified while counting coins or checking the card acquirer." : "Ex.: diferença identificada na conferência de moedas ou na operadora de cartão."}
+                placeholder={localize(locale, "E.g.: difference identified while counting coins or checking the card acquirer.", "Ej.: diferencia identificada al contar monedas o verificar la operadora de tarjetas.", "Ex.: diferença identificada na conferência de moedas ou na operadora de cartão.")}
               />
             </label>
           )}
@@ -2986,15 +3025,15 @@ export function ValidationPage() {
               <CheckCircle2 size={22} />
               <div>
                 <strong>
-                  {locale === "en" ? "Closing validated " : "Fechamento validado "}
+                  {locale === "en" ? "Closing validated " : locale === "es" ? "Cierre validado " : "Fechamento validado "}
                   {balanced
-                    ? locale === "en" ? "with no discrepancy" : "sem quebra"
-                    : locale === "en" ? `with ${localizedClosureStatus}` : `com ${closureStatus.toLowerCase()}`}
+                    ? localize(locale, "with no discrepancy", "sin diferencia", "sem quebra")
+                    : locale === "en" ? `with ${localizedClosureStatus}` : locale === "es" ? `con ${localizedClosureStatus}` : `com ${closureStatus.toLowerCase()}`}
                   .
                 </strong>
                 <span>
-                  {locale === "en" ? "Record saved to local history at " : "Registro salvo no histórico local em "}
-                  {new Intl.DateTimeFormat("pt-BR", {
+                  {localize(locale, "Record saved to local history at ", "Registro guardado en el historial local el ", "Registro salvo no histórico local em ")}
+                  {new Intl.DateTimeFormat(locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR", {
                     dateStyle: "short",
                     timeStyle: "short",
                   }).format(new Date(session.validatedAt))}
@@ -3006,16 +3045,16 @@ export function ValidationPage() {
             <div className="validated-banner">
               <CheckCircle2 size={22} />
               <div>
-                <strong>{locale === "en" ? "Thermal receipt preview." : "Prévia do comprovante térmico."}</strong>
+                <strong>{locale === "en" ? "Thermal receipt preview." : locale === "es" ? "Vista previa del comprobante térmico." : "Prévia do comprovante térmico."}</strong>
                 <span>
-                  {locale === "en" ? "The print action appears here after validating a closing." : "A ação de impressão aparece aqui após validar um fechamento."}
+                  {localize(locale, "The print action appears here after validating a closing.", "La acción de impresión aparece aquí después de validar un cierre.", "A ação de impressão aparece aqui após validar um fechamento.")}
                 </span>
               </div>
             </div>
           ) : null}
           <div className="flow-actions closure-actions">
             <Link href="/contagem" className="pixbee-text-button">
-              <ArrowLeft size={17} /> {locale === "en" ? "Adjust count" : "Ajustar contagem"}
+              <ArrowLeft size={17} /> {localize(locale, "Adjust count", "Ajustar conteo", "Ajustar contagem")}
             </Link>
             <div>
               {canPrintReceipt ? (
@@ -3025,10 +3064,10 @@ export function ValidationPage() {
                   disabled={isPrinting}
                 >
                   {isPrinting ? (
-                    <LoadingIndicator compact label={locale === "en" ? "Opening print dialog..." : "Abrindo impressão..."} />
+                    <LoadingIndicator compact label={localize(locale, "Opening print dialog...", "Abriendo el diálogo de impresión...", "Abrindo impressão...")} />
                   ) : (
                     <>
-                      <Printer size={18} /> {locale === "en" ? "Print receipt" : "Imprimir comprovante"}
+                      <Printer size={18} /> {localize(locale, "Print receipt", "Imprimir comprobante", "Imprimir comprovante")}
                     </>
                   )}
                 </Button>
@@ -3041,7 +3080,7 @@ export function ValidationPage() {
                     navigate("/abertura");
                   }}
                 >
-                  {locale === "en" ? "Open new count" : "Abrir nova contagem"} <ArrowRight size={18} />
+                  {localize(locale, "Open new count", "Abrir nuevo conteo", "Abrir nova contagem")} <ArrowRight size={18} />
                 </Button>
               ) : (
                 <Button
@@ -3050,11 +3089,11 @@ export function ValidationPage() {
                   disabled={isValidating}
                 >
                   {isValidating ? (
-                    <LoadingIndicator compact label={locale === "en" ? "Saving closing..." : "Registrando fechamento..."} />
+                    <LoadingIndicator compact label={localize(locale, "Saving closing...", "Guardando cierre...", "Registrando fechamento...")} />
                   ) : (
                     <>
-                      <CheckCircle2 size={18} /> {locale === "en" ? "Validate " : "Validar "}
-                      {balanced ? locale === "en" ? "closing" : "fechamento" : locale === "en" ? "with discrepancy" : "com quebra"}
+                      <CheckCircle2 size={18} /> {locale === "en" ? "Validate " : locale === "es" ? "Validar " : "Validar "}
+                      {balanced ? locale === "en" ? "closing" : locale === "es" ? "cierre" : "fechamento" : locale === "en" ? "with discrepancy" : locale === "es" ? "con diferencia" : "com quebra"}
                     </>
                   )}
                 </Button>
@@ -3095,27 +3134,27 @@ function ThermalHistoryReport({ records }: { records: ShiftHistoryRecord[] }) {
         <section className="thermal-history-shift" key={record.id}>
           <h3>{record.company}</h3>
           <div className="thermal-row">
-            <span>{locale === "en" ? "Operator" : "Operador"}</span>
+            <span>{locale === "en" ? "Operator" : locale === "es" ? "Operador" : "Operador"}</span>
             <b>{record.operator}</b>
           </div>
           <div className="thermal-row">
-            <span>{locale === "en" ? "Opening" : "Abertura"}</span>
+            <span>{locale === "en" ? "Opening" : locale === "es" ? "Apertura" : "Abertura"}</span>
             <b>{formatDateTime(record.startedAt, locale)}</b>
           </div>
           <div className="thermal-row">
-            <span>{locale === "en" ? "Closing" : "Fechamento"}</span>
+            <span>{locale === "en" ? "Closing" : locale === "es" ? "Cierre" : "Fechamento"}</span>
             <b>{formatDateTime(record.finishedAt, locale)}</b>
           </div>
           <div className="thermal-row">
-            <span>{locale === "en" ? "Duration" : "Duração"}</span>
+            <span>{locale === "en" ? "Duration" : locale === "es" ? "Duración" : "Duração"}</span>
             <b>{formatShiftDuration(record.startedAt, record.finishedAt, locale)}</b>
           </div>
           <div className="thermal-row">
-            <span>{locale === "en" ? "Expected" : "Esperado"}</span>
+            <span>{locale === "en" ? "Expected" : locale === "es" ? "Esperado" : "Esperado"}</span>
             <b>{formatCurrency(record.totalExpected)}</b>
           </div>
           <div className="thermal-row">
-            <span>{locale === "en" ? "Counted" : "Conferido"}</span>
+            <span>{locale === "en" ? "Counted" : locale === "es" ? "Contado" : "Conferido"}</span>
             <b>{formatCurrency(record.totalFound)}</b>
           </div>
           <div className="thermal-row">
@@ -3136,12 +3175,12 @@ function ThermalHistoryReport({ records }: { records: ShiftHistoryRecord[] }) {
                 <div className="thermal-row" key={entry.id}>
                   <div>
                     <span>
-                      {locale === "en" ? "Cash entry" : "Entrada em dinheiro"} · {formatShortTime(entry.createdAt)}
+                      {locale === "en" ? "Cash entry" : locale === "es" ? "Entrada de efectivo" : "Entrada em dinheiro"} · {formatShortTime(entry.createdAt)}
                     </span>
                     <small>
                       {locale === "en" ? "Received" : "Recebido"} {formatCurrency(getGrossAmount(entry))}
                       {getChangeAmount(entry) > 0
-                        ? ` · ${locale === "en" ? "change" : "troco"} ${formatCurrency(getChangeAmount(entry))}`
+                        ? ` · ${locale === "en" ? "change" : locale === "es" ? "cambio" : "troco"} ${formatCurrency(getChangeAmount(entry))}`
                         : locale === "en" ? " · no change" : " · sem troco"}
                     </small>
                   </div>
@@ -3149,7 +3188,7 @@ function ThermalHistoryReport({ records }: { records: ShiftHistoryRecord[] }) {
                 </div>
               ))}
               <div className="thermal-row">
-                <span>{locale === "en" ? "Total cash entries" : "Total acumulado em espécie"}</span>
+                <span>{locale === "en" ? "Total cash entries" : locale === "es" ? "Total acumulado en efectivo" : "Total acumulado em espécie"}</span>
                 <b>
                   {formatCurrency(sumCashEntries(record.cashEntries))}
                 </b>
@@ -3229,18 +3268,18 @@ export function HistoryPage() {
     setSelectedShift("all");
     setRetentionNoticeOpen(false);
     setAwaitingPrintConfirmation(false);
-    toast.success(locale === "en" ? "Local history cleared after report generation." : "Histórico local limpo após a geração do relatório.");
+    toast.success(locale === "en" ? "Local history cleared after report generation." : locale === "es" ? "Historial local limpiado después de generar el informe." : "Histórico local limpo após a geração do relatório.");
   };
   const exportPdfReport = (clearAfterDownload = false) => {
     if (records.length === 0) {
-      toast.error(locale === "en" ? "There are no shifts to export in this report." : "Não há turnos para exportar neste relatório.");
+      toast.error(localize(locale, "There are no shifts to export in this report.", "No hay turnos para exportar en este informe.", "Não há turnos para exportar neste relatório."));
       return;
     }
     setIsExportingPdf(true);
     window.setTimeout(() => {
       exportHistoryPdf(records, { locale });
       if (clearAfterDownload) clearLocalHistory();
-      else toast.success(locale === "en" ? "PDF report exported for archiving." : "Relatório em PDF exportado para arquivamento.");
+      else toast.success(localize(locale, "PDF report exported for archiving.", "Informe PDF exportado para archivar.", "Relatório em PDF exportado para arquivamento."));
       setIsExportingPdf(false);
     }, 120);
   };
@@ -3262,26 +3301,26 @@ export function HistoryPage() {
   }, [clearAfterPrint]);
   return (
     <>
-      <AppShell title={locale === "en" ? "Shift history" : "Histórico de turnos"} currentStep={3}>
+      <AppShell title={locale === "en" ? "Shift history" : locale === "es" ? "Historial de turnos" : "Histórico de turnos"} currentStep={3}>
         <section className="history-page">
           <div className="glass-panel history-heading">
             <div>
-              <span>{locale === "en" ? "Entry lookup" : "Consulta de lançamentos"}</span>
+              <span>{localize(locale, "Entry lookup", "Consulta de movimientos", "Consulta de lançamentos")}</span>
               <h2>
-                {locale === "en" ? "Find every cash entry, withdrawal, and supply by the shift where it was recorded." : "Encontre cada entrada em espécie, sangria e suprimento pelo turno em que foram registrados."}
+                {localize(locale, "Find every cash entry, withdrawal, and supply by the shift where it was recorded.", "Encuentra cada entrada de efectivo, retiro e ingreso por el turno en que fue registrado.", "Encontre cada entrada em espécie, sangria e suprimento pelo turno em que foram registrados.")}
               </h2>
               <p>
-                {locale === "en" ? "Records remain available in this browser for up to three days; audit actions are retained only for the report and receipt." : "Os registros ficam disponíveis por até três dias neste navegador; as ações de auditoria seguem somente para o relatório e o canhoto."}
+                {localize(locale, "Records remain available in this browser for up to three days; audit actions are retained only for the report and receipt.", "Los registros permanecen disponibles hasta tres días en este navegador; las acciones de auditoría se conservan solo para el informe y el comprobante.", "Os registros ficam disponíveis por até três dias neste navegador; as ações de auditoria seguem somente para o relatório e o canhoto.")}
               </p>
             </div>
             <div className="history-filter">
-              <label>{locale === "en" ? "Filter by shift" : "Filtrar por turno"}</label>
+              <label>{localize(locale, "Filter by shift", "Filtrar por turno", "Filtrar por turno")}</label>
               <Select value={selectedShift} onValueChange={setSelectedShift}>
                 <SelectTrigger>
-                  <SelectValue placeholder={locale === "en" ? "Select a shift" : "Selecione um turno"} />
+                  <SelectValue placeholder={localize(locale, "Select a shift", "Selecciona un turno", "Selecione um turno")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{locale === "en" ? "All shifts" : "Todos os turnos"}</SelectItem>
+                  <SelectItem value="all">{localize(locale, "All shifts", "Todos los turnos", "Todos os turnos")}</SelectItem>
                   {records.map(record => (
                     <SelectItem value={record.shiftId} key={record.shiftId}>
                       {getShiftLabel(record, locale)}
@@ -3297,10 +3336,10 @@ export function HistoryPage() {
                   disabled={isPrintingReport}
                 >
                   {isPrintingReport ? (
-                    <LoadingIndicator compact label={locale === "en" ? "Opening print dialog..." : "Abrindo impressão..."} />
+                    <LoadingIndicator compact label={localize(locale, "Opening print dialog...", "Abriendo el diálogo de impresión...", "Abrindo impressão...")} />
                   ) : (
                     <>
-                      <Printer size={16} /> {locale === "en" ? "Print report" : "Imprimir relatório"}
+                      <Printer size={16} /> {localize(locale, "Print report", "Imprimir informe", "Imprimir relatório")}
                     </>
                   )}
                 </Button>
@@ -3311,10 +3350,10 @@ export function HistoryPage() {
                   disabled={isExportingPdf}
                 >
                   {isExportingPdf ? (
-                    <LoadingIndicator compact label={locale === "en" ? "Generating PDF..." : "Gerando PDF..."} />
+                    <LoadingIndicator compact label={localize(locale, "Generating PDF...", "Generando PDF...", "Gerando PDF...")} />
                   ) : (
                     <>
-                      <Download size={16} /> {locale === "en" ? "Download PDF" : "Baixar PDF"}
+                      <Download size={16} /> {localize(locale, "Download PDF", "Descargar PDF", "Baixar PDF")}
                     </>
                   )}
                 </Button>
@@ -3325,16 +3364,16 @@ export function HistoryPage() {
             <div className="glass-panel history-empty">
               <History size={30} />
               <div>
-                <strong>{locale === "en" ? "No closed shifts in this filter." : "Nenhum turno fechado neste filtro."}</strong>
+                <strong>{locale === "en" ? "No closed shifts in this filter." : locale === "es" ? "No hay turnos cerrados en este filtro." : "Nenhum turno fechado neste filtro."}</strong>
                 <span>
-                  {locale === "en" ? "Validate a closing to view entries and totals here." : "Valide um fechamento para consultar os lançamentos e totais aqui."}
+                  {localize(locale, "Validate a closing to view entries and totals here.", "Valida un cierre para consultar aquí los movimientos y totales.", "Valide um fechamento para consultar os lançamentos e totais aqui.")}
                 </span>
               </div>
               <Button
                 className="pixbee-primary-button"
                 onClick={() => window.location.assign("/abertura")}
               >
-                {locale === "en" ? "Start count" : "Iniciar contagem"} <ArrowRight size={17} />
+                {localize(locale, "Start count", "Iniciar conteo", "Iniciar contagem")} <ArrowRight size={17} />
               </Button>
             </div>
           ) : (
@@ -3344,35 +3383,35 @@ export function HistoryPage() {
                   <header>
                     <div>
                       <span>
-                        {new Intl.DateTimeFormat(locale === "en" ? "en-US" : "pt-BR", {
+                        {new Intl.DateTimeFormat(locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR", {
                           dateStyle: "long",
                           timeStyle: "short",
                         }).format(new Date(record.finishedAt))}
                       </span>
                       <h3>{record.company}</h3>
                       <p>
-                        {locale === "en" ? "Operator:" : "Operador:"} <strong>{record.operator}</strong>
+                        {localize(locale, "Operator:", "Operador:", "Operador:")} <strong>{record.operator}</strong>
                       </p>
                     </div>
                     <b
                       className={`history-status ${record.status === "SEM QUEBRA" ? "balanced" : record.status === "SOBRA" ? "positive" : "negative"}`}
                     >
                       {record.status === "SEM QUEBRA"
-                        ? locale === "en" ? "No discrepancy" : "Sem quebra"
-                        : `${record.status === "SOBRA" ? locale === "en" ? "Surplus" : "Sobra" : locale === "en" ? "Shortage" : "Falta"} ${locale === "en" ? "of" : "de"} ${formatCurrency(Math.abs(record.difference))}`}
+                        ? localize(locale, "No discrepancy", "Sin diferencia", "Sem quebra")
+                        : `${record.status === "SOBRA" ? localize(locale, "Surplus", "Sobrante", "Sobra") : localize(locale, "Shortage", "Faltante", "Falta")} ${localize(locale, "of", "de", "de")} ${formatCurrency(Math.abs(record.difference))}`}
                     </b>
                   </header>
                   <div className="history-period">
                     <span>
-                      {locale === "en" ? "Opening:" : "Abertura:"}{" "}
+                      {localize(locale, "Opening:", "Apertura:", "Abertura:")}{" "}
                       <strong>{formatDateTime(record.startedAt, locale)}</strong>
                     </span>
                     <span>
-                      {locale === "en" ? "Closing:" : "Fechamento:"}{" "}
+                      {locale === "en" ? "Closing:" : locale === "es" ? "Cierre:" : "Fechamento:"}{" "}
                       <strong>{formatDateTime(record.finishedAt, locale)}</strong>
                     </span>
                     <span>
-                      {locale === "en" ? "Duration:" : "Duração:"}{" "}
+                      {localize(locale, "Duration:", "Duración:", "Duração:")}{" "}
                       <strong>
                         {formatShiftDuration(
                           record.startedAt,
@@ -3384,15 +3423,15 @@ export function HistoryPage() {
                   </div>
                   <div className="history-record-totals">
                     <div>
-                      <span>{locale === "en" ? "Expected" : "Esperado"}</span>
+                      <span>{locale === "en" ? "Expected" : locale === "es" ? "Esperado" : "Esperado"}</span>
                       <strong>{formatCurrency(record.totalExpected)}</strong>
                     </div>
                     <div>
-                      <span>{locale === "en" ? "Counted" : "Conferido"}</span>
+                      <span>{locale === "en" ? "Counted" : locale === "es" ? "Contado" : "Conferido"}</span>
                       <strong>{formatCurrency(record.totalFound)}</strong>
                     </div>
                     <div>
-                      <span>{locale === "en" ? "Difference" : "Diferença"}</span>
+                      <span>{locale === "en" ? "Difference" : locale === "es" ? "Diferencia" : "Diferença"}</span>
                       <strong
                         className={
                           record.difference === 0
@@ -3409,11 +3448,15 @@ export function HistoryPage() {
                   </div>
                   <div className="history-adjustments">
                     <div className="history-adjustments-title">
-                      <span>{locale === "en" ? "Cash entries" : "Entradas em espécie"}</span>
+                      <span>{locale === "en" ? "Cash entries" : locale === "es" ? "Entradas en efectivo" : "Entradas em espécie"}</span>
                       <small>
                         {record.cashEntries.length === 0
-                          ? locale === "en" ? "No additional entries" : "Nenhuma entrada adicional"
-                          : locale === "en" ? `${record.cashEntries.length} cash entr${record.cashEntries.length > 1 ? "ies" : "y"} · ${formatCurrency(sumCashEntries(record.cashEntries))}` : `${record.cashEntries.length} entrada${record.cashEntries.length > 1 ? "s" : ""} · ${formatCurrency(sumCashEntries(record.cashEntries))}`}
+                          ? locale === "en" ? "No additional entries" : locale === "es" ? "No hay entradas adicionales" : "Nenhuma entrada adicional"
+                          : locale === "en"
+                            ? `${record.cashEntries.length} cash entr${record.cashEntries.length > 1 ? "ies" : "y"} · ${formatCurrency(sumCashEntries(record.cashEntries))}`
+                            : locale === "es"
+                              ? `${record.cashEntries.length} entrada${record.cashEntries.length > 1 ? "s" : ""} · ${formatCurrency(sumCashEntries(record.cashEntries))}`
+                              : `${record.cashEntries.length} entrada${record.cashEntries.length > 1 ? "s" : ""} · ${formatCurrency(sumCashEntries(record.cashEntries))}`}
                       </small>
                     </div>
                     {record.cashEntries.length > 0 && (
@@ -3422,15 +3465,15 @@ export function HistoryPage() {
                           <div key={entry.id}>
                             <time>{formatShortTime(entry.createdAt)}</time>
                             <span>
-                              <strong>{locale === "en" ? "Cash entry" : "Entrada em dinheiro"}</strong>
+                              <strong>{locale === "en" ? "Cash entry" : locale === "es" ? "Entrada de efectivo" : "Entrada em dinheiro"}</strong>
                               <small>
-                                {locale === "en" ? "Received" : "Recebido"} {formatCurrency(getGrossAmount(entry))}
+                                {localize(locale, "Received", "Recibido", "Recebido")} {formatCurrency(getGrossAmount(entry))}
                                 {getChangeAmount(entry) > 0
-                                  ? ` · ${locale === "en" ? "change" : "troco"} ${formatCurrency(getChangeAmount(entry))}`
-                                  : locale === "en" ? " · no change" : " · sem troco"}
+                                  ? ` · ${locale === "en" ? "change" : locale === "es" ? "cambio" : "troco"} ${formatCurrency(getChangeAmount(entry))}`
+                                  : ` · ${localize(locale, "no change", "sin cambio", "sem troco")}`}
                               </small>
                             </span>
-                            <b className="positive">{locale === "en" ? "Net +" : "Líquido +"} {formatCurrency(entry.amount)}</b>
+                            <b className="positive">{localize(locale, "Net +", "Neto +", "Líquido +")} {formatCurrency(entry.amount)}</b>
                           </div>
                         ))}
                       </div>
@@ -3438,11 +3481,15 @@ export function HistoryPage() {
                   </div>
                   <div className="history-adjustments">
                     <div className="history-adjustments-title">
-                      <span>{locale === "en" ? "Shift movements" : "Lançamentos do turno"}</span>
+                      <span>{localize(locale, "Shift movements", "Movimientos del turno", "Lançamentos do turno")}</span>
                       <small>
                         {record.adjustments.length === 0
-                          ? locale === "en" ? "No withdrawals or supplies" : "Sem sangrias ou suprimentos"
-                          : locale === "en" ? `${record.adjustments.length} movement${record.adjustments.length > 1 ? "s" : ""}` : `${record.adjustments.length} registro${record.adjustments.length > 1 ? "s" : ""}`}
+                          ? localize(locale, "No withdrawals or supplies", "Sin retiros ni ingresos", "Sem sangrias ou suprimentos")
+                          : locale === "en"
+                            ? `${record.adjustments.length} movement${record.adjustments.length > 1 ? "s" : ""}`
+                            : locale === "es"
+                              ? `${record.adjustments.length} movimiento${record.adjustments.length > 1 ? "s" : ""}`
+                              : `${record.adjustments.length} registro${record.adjustments.length > 1 ? "s" : ""}`}
                       </small>
                     </div>
                     {record.adjustments.length > 0 && (
@@ -3453,10 +3500,10 @@ export function HistoryPage() {
                             <span>
                               <strong>
                                 {entry.type === "withdrawal"
-                                  ? locale === "en" ? "Withdrawal" : "Sangria"
-                                  : locale === "en" ? "Supply" : "Suprimento"}
+                                  ? localize(locale, "Withdrawal", "Retiro", "Sangria")
+                                  : localize(locale, "Supply", "Ingreso", "Suprimento")}
                               </strong>
-                              <small>{entry.note || (locale === "en" ? "No description" : "Sem identificação")}</small>
+                              <small>{entry.note || localize(locale, "No description", "Sin descripción", "Sem identificação")}</small>
                             </span>
                             <b
                               className={
@@ -3490,20 +3537,20 @@ export function HistoryPage() {
               <History size={22} />
             </span>
             <AlertDialogTitle>
-              {locale === "en" ? "Your local history is ready for archiving" : "Seu histórico local está pronto para arquivamento"}
+              {localize(locale, "Your local history is ready for archiving", "Tu historial local está listo para archivar", "Seu histórico local está pronto para arquivamento")}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {locale === "en" ? "Some records are more than three days old. Print or export the PDF now; afterward, PixBee can safely clear only this machine's cache." : "Há registros com mais de três dias. Imprima ou exporte o PDF agora; depois, o PixBee poderá limpar somente o cache desta máquina com segurança."}
+              {localize(locale, "Some records are more than three days old. Print or export the PDF now; afterward, PixBee can safely clear only this machine's cache.", "Algunos registros tienen más de tres días. Imprime o exporta el PDF ahora; después, PixBee podrá borrar de forma segura solo la caché de este dispositivo.", "Há registros com mais de três dias. Imprima ou exporte o PDF agora; depois, o PixBee poderá limpar somente o cache desta máquina com segurança.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="retention-dialog-note">
-            <strong>{locale === "en" ? "What will be preserved in the report" : "O que será preservado no relatório"}</strong>
+            <strong>{localize(locale, "What will be preserved in the report", "Qué se conservará en el informe", "O que será preservado no relatório")}</strong>
             <span>
-              {locale === "en" ? "Shifts, times, entries, and audit reasons." : "Turnos, horários, lançamentos e justificativas de auditoria."}
+              {locale === "en" ? "Shifts, times, entries, and audit reasons." : locale === "es" ? "Turnos, horarios, movimientos y motivos de auditoría." : "Turnos, horários, lançamentos e justificativas de auditoria."}
             </span>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel>{locale === "en" ? "Clear later" : "Limpar depois"}</AlertDialogCancel>
+            <AlertDialogCancel>{localize(locale, "Clear later", "Limpiar después", "Limpar depois")}</AlertDialogCancel>
             <Button
               type="button"
               variant="outline"
@@ -3515,11 +3562,11 @@ export function HistoryPage() {
               }}
             >
               {isExportingPdf ? (
-                                    <LoadingIndicator compact label={locale === "en" ? "Generating PDF..." : "Gerando PDF..."} />
+                                    <LoadingIndicator compact label={localize(locale, "Generating PDF...", "Generando PDF...", "Gerando PDF...")} />
 
               ) : (
                 <>
-                  <Download size={16} /> {locale === "en" ? "Download PDF and clear" : "Baixar PDF e limpar"}
+                  <Download size={16} /> {localize(locale, "Download PDF and clear", "Descargar PDF y limpiar", "Baixar PDF e limpar")}
                 </>
               )}
             </Button>
@@ -3532,11 +3579,11 @@ export function HistoryPage() {
               }}
             >
               {isPrintingReport ? (
-                                    <LoadingIndicator compact label={locale === "en" ? "Opening print dialog..." : "Abrindo impressão..."} />
+                                    <LoadingIndicator compact label={localize(locale, "Opening print dialog...", "Abriendo el diálogo de impresión...", "Abrindo impressão...")} />
 
               ) : (
                 <>
-                  <Printer size={16} /> {locale === "en" ? "Print report" : "Imprimir relatório"}
+                  <Printer size={16} /> {localize(locale, "Print report", "Imprimir informe", "Imprimir relatório")}
                 </>
               )}
             </AlertDialogAction>
@@ -3550,19 +3597,19 @@ export function HistoryPage() {
         <AlertDialogContent className="history-dialog">
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {locale === "en" ? "Confirm report printing?" : "Confirma a impressão do relatório?"}
+              {localize(locale, "Confirm report printing?", "¿Confirmas la impresión del informe?", "Confirma a impressão do relatório?")}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {locale === "en" ? "Confirm only after printing the report. This confirmation clears the expired local history from this machine." : "Confirme somente após imprimir o relatório. Esta confirmação limpa o histórico local vencido desta máquina."}
+              {localize(locale, "Confirm only after printing the report. This confirmation clears the expired local history from this machine.", "Confirma solo después de imprimir el informe. Esta confirmación limpia el historial local vencido de este dispositivo.", "Confirme somente após imprimir o relatório. Esta confirmação limpa o histórico local vencido desta máquina.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{locale === "en" ? "Keep history" : "Manter histórico"}</AlertDialogCancel>
+            <AlertDialogCancel>{localize(locale, "Keep history", "Conservar historial", "Manter histórico")}</AlertDialogCancel>
             <AlertDialogAction
               className="history-delete-confirm"
               onClick={clearLocalHistory}
             >
-              {locale === "en" ? "Confirm and clear" : "Confirmar e limpar"}
+              {locale === "en" ? "Confirm and clear" : locale === "es" ? "Confirmar y limpiar" : "Confirmar e limpar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -3585,33 +3632,33 @@ function CreatorAboutPage() {
     }
   }
   return (
-    <AppShell title={locale === "en" ? "About PixBee" : "Sobre o PixBee"} currentStep={1}>
-      <section className="creator-about-page">
+    <AppShell title={localize(locale, "About PixBee", "Sobre PixBee", "Sobre o PixBee")} currentStep={1}>
+    <section className="creator-about-page">
         <article className="glass-panel creator-profile">
           <div className="creator-photo-frame">
             <img
               src="/assets/khaleesi-saithe-profile.webp"
-              alt={locale === "en" ? "Khaleesi Saithe, creator of PixBee FechaCaixa" : "Khaleesi Saithe, criadora do PixBee FechaCaixa"}
+              alt={localize(locale, "Khaleesi Saithe, creator of PixBee FechaCaixa", "Khaleesi Saithe, creadora de PixBee FechaCaixa", "Khaleesi Saithe, criadora do PixBee FechaCaixa")}
             />
           </div>
           <div className="creator-profile-copy">
-            <span className="panel-tag">{locale === "en" ? "Behind the project" : "Por trás do projeto"}</span>
+            <span className="panel-tag">{localize(locale, "Behind the project", "Detrás del proyecto", "Por trás do projeto")}</span>
             <p className="creator-kicker">KHALEESI SAITHE</p>
-            <h2>{locale === "en" ? "Turning operational experience into useful tools." : "Transformando experiência de operação em ferramentas úteis."}</h2>
+            <h2>{localize(locale, "Turning operational experience into useful tools.", "Transformando la experiencia operativa en herramientas útiles.", "Transformando experiência de operação em ferramentas úteis.")}</h2>
             <p>
-              {locale === "en" ? "Moving from operations and retail into Data Science, Khaleesi studies at Estácio de Sá and creates products born from real problems faced by people who work with customer service and cash reconciliation." : "Em transição de operações e varejo para a Ciência de Dados, Khaleesi cursa Estácio de Sá e cria produtos que nascem de problemas reais de quem trabalha com atendimento e conferência de caixa."}
+              {localize(locale, "Moving from operations and retail into Data Science, Khaleesi studies at Estácio de Sá and creates products born from real problems faced by people who work with customer service and cash reconciliation.", "En transición desde operaciones y comercio minorista hacia la Ciencia de Datos, Khaleesi estudia en Estácio de Sá y crea productos nacidos de problemas reales de quienes trabajan con atención al cliente y conciliación de caja.", "Em transição de operações e varejo para a Ciência de Dados, Khaleesi cursa Estácio de Sá e cria produtos que nascem de problemas reais de quem trabalha com atendimento e conferência de caixa.")}
             </p>
             <p>
-              {locale === "en" ? <>Projects include <strong>PDFToolkit</strong>, for PDF sales reports, and <strong>PixBee/ContaCaixa</strong>, designed to make daily cash closing easier.</> : <>Entre os projetos estão o <strong>PDFToolkit</strong>, para relatórios de vendas em PDF, e o <strong>PixBee/ContaCaixa</strong>, pensado para facilitar o fechamento de caixa no dia a dia.</>}
+              {locale === "en" ? <>Projects include <strong>PDFToolkit</strong>, for PDF sales reports, and <strong>PixBee/ContaCaixa</strong>, designed to make daily cash closing easier.</> : locale === "es" ? <>Entre los proyectos se encuentran <strong>PDFToolkit</strong>, para informes de ventas en PDF, y <strong>PixBee/ContaCaixa</strong>, pensado para facilitar el cierre diario de caja.</> : <>Entre os projetos estão o <strong>PDFToolkit</strong>, para relatórios de vendas em PDF, e o <strong>PixBee/ContaCaixa</strong>, pensado para facilitar o fechamento de caixa no dia a dia.</>}
             </p>
           </div>
         </article>
         <aside className="glass-panel creator-connect">
           <div className="creator-connect-intro">
-            <span>{locale === "en" ? "Let's connect" : "Vamos nos conectar"}</span>
-            <h2>{locale === "en" ? "Follow the projects and the creative journey." : "Acompanhe os projetos e a jornada de criação."}</h2>
+            <span>{localize(locale, "Let's connect", "Conectemos", "Vamos nos conectar")}</span>
+            <h2>{localize(locale, "Follow the projects and the creative journey.", "Sigue los proyectos y el recorrido creativo.", "Acompanhe os projetos e a jornada de criação.")}</h2>
             <p>
-              {locale === "en" ? "This page brings together the creator's professional channels." : "Esta página reúne os canais profissionais da criadora do PixBee."}
+              {localize(locale, "This page brings together the creator's professional channels.", "Esta página reúne los canales profesionales de la creadora de PixBee.", "Esta página reúne os canais profissionais da criadora do PixBee.")}
             </p>
           </div>
           <div className="creator-link-list">
@@ -3624,7 +3671,7 @@ function CreatorAboutPage() {
                 <Store size={20} />
               </span>
               <div>
-                <strong>{locale === "en" ? "Portfolio" : "Portfólio"}</strong>
+                <strong>{localize(locale, "Portfolio", "Portafolio", "Portfólio")}</strong>
                 <small>khaleesi-portifolio.vercel.app</small>
               </div>
               <ArrowRight size={18} />
@@ -3660,15 +3707,15 @@ function CreatorAboutPage() {
           </div>
           <section className="pix-support-card">
             <div>
-              <span className="pix-support-label">APOIE O PROJETO</span>
-                              <strong>{locale === "en" ? "Support via Pix" : "Contribuição via Pix"}</strong>
+              <span className="pix-support-label">{localize(locale, "SUPPORT THE PROJECT", "APOYA EL PROYECTO", "APOIE O PROJETO")}</span>
+                              <strong>{localize(locale, "Support via Pix", "Contribución vía PIX", "Contribuição via Pix")}</strong>
 
               <small>
-                {locale === "en" ? "If PixBee is useful to you, any support helps keep the project evolving." : "Se o PixBee for útil para você, qualquer apoio ajuda a manter a evolução do projeto."}
+                {localize(locale, "If PixBee is useful to you, any support helps keep the project evolving.", "Si PixBee te resulta útil, cualquier apoyo ayuda a mantener la evolución del proyecto.", "Se o PixBee for útil para você, qualquer apoio ajuda a manter a evolução do projeto.")}
               </small>
             </div>
             <div className="pix-key">
-              <span>{locale === "en" ? "Pix key" : "Chave Pix"}</span>
+              <span>{localize(locale, "Pix key", "Clave PIX", "Chave Pix")}</span>
               <b>{pixKey}</b>
             </div>
             <Button
@@ -3681,14 +3728,14 @@ function CreatorAboutPage() {
               ) : (
                 <ReceiptText size={17} />
               )}
-              {pixCopied ? locale === "en" ? "Key copied" : "Chave copiada" : locale === "en" ? "Copy Pix key" : "Copiar chave Pix"}
+              {pixCopied ? localize(locale, "Key copied", "Clave copiada", "Chave copiada") : localize(locale, "Copy Pix key", "Copiar clave PIX", "Copiar chave Pix")}
             </Button>
           </section>
         </aside>
         <AdSenseSlot
           slot={adsenseSettings.aboutSlot}
           publicRoute="/sobre"
-          label={locale === "en" ? "Advertisement" : "Publicidade"}
+          label={localize(locale, "Advertisement", "Publicidad", "Publicidade")}
         />
       </section>
     </AppShell>
@@ -3772,85 +3819,85 @@ function AboutPage() {
 function LegalPage() {
   const { locale } = useLanguage();
   return (
-    <AppShell title={locale === "en" ? "Privacy and rights" : "Privacidade e direitos"} currentStep={1}>
+    <AppShell title={localize(locale, "Privacy and rights", "Privacidad y derechos", "Privacidade e direitos")} currentStep={1}>
       <section className="legal-page">
         <header className="glass-panel legal-hero">
-          <span className="panel-tag">{locale === "en" ? "PixBee transparency" : "Transparência do PixBee"}</span>
+          <span className="panel-tag">{localize(locale, "PixBee transparency", "Transparencia de PixBee", "Transparência do PixBee")}</span>
           <h2>
-            {locale === "en" ? "Cash data stays in your browser. The rules of use remain visible." : "Dados do caixa ficam no seu navegador. As regras de uso ficam visíveis."}
+            {localize(locale, "Cash data stays in your browser. The rules of use remain visible.", "Los datos de caja permanecen en tu navegador. Las reglas de uso siguen visibles.", "Dados do caixa ficam no seu navegador. As regras de uso ficam visíveis.")}
           </h2>
           <p>
-            {locale === "en" ? "This page explains how the current version of PixBee FechaCaixa handles shift information, the operator's responsibilities, and the declared rights over the software." : "Esta página explica como a versão atual do PixBee FechaCaixa trata as informações do turno, quais são as responsabilidades do operador e como os direitos sobre o software são declarados."}
+            {localize(locale, "This page explains how the current version of PixBee FechaCaixa handles shift information, the operator's responsibilities, and the declared rights over the software.", "Esta página explica cómo la versión actual de PixBee FechaCaixa trata la información del turno, las responsabilidades de la persona operadora y los derechos declarados sobre el software.", "Esta página explica como a versão atual do PixBee FechaCaixa trata as informações do turno, quais são as responsabilidades do operador e como os direitos sobre o software são declarados.")}
           </p>
-          <p className="legal-updated">{locale === "en" ? "Updated on August 21, 2026" : "Atualizado em 21 de agosto de 2026"}</p>
+          <p className="legal-updated">{localize(locale, "Updated on August 21, 2026", "Actualizado el 21 de agosto de 2026", "Atualizado em 21 de agosto de 2026")}</p>
         </header>
         <div className="legal-grid">
           <article className="glass-panel legal-card">
-            <span>{locale === "en" ? "01 · PRIVACY" : "01 · PRIVACIDADE"}</span>
-            <h3>{locale === "en" ? "What is stored" : "O que é guardado"}</h3>
+            <span>{localize(locale, "01 · PRIVACY", "01 · PRIVACIDAD", "01 · PRIVACIDADE")}</span>
+            <h3>{localize(locale, "What is stored", "Qué se almacena", "O que é guardado")}</h3>
             <p>
-              {locale === "en" ? "PixBee may store the operator's name, company, opening and counted amounts, withdrawals and supplies, times, notes, audit reasons, and shift history in the browser." : "O PixBee pode armazenar no navegador o nome do operador, a empresa, os valores de abertura e conferência, os lançamentos de sangria e suprimento, horários, observações, justificativas de auditoria e o histórico de turnos."}
+              {localize(locale, "PixBee may store the operator's name, company, opening and counted amounts, withdrawals and supplies, times, notes, audit reasons, and shift history in the browser.", "PixBee puede almacenar en el navegador el nombre de la persona operadora, la empresa, los importes de apertura y conteo, retiros e ingresos, horarios, observaciones, motivos de auditoría y el historial de turnos.", "O PixBee pode armazenar no navegador o nome do operador, a empresa, os valores de abertura e conferência, os lançamentos de sangria e suprimento, horários, observações, justificativas de auditoria e o histórico de turnos.")}
             </p>
             <p>
-              {locale === "en" ? "This data is used only to calculate, review, print, and export the cash closing on the device where it was entered." : "Esses dados são usados apenas para calcular, revisar, imprimir e exportar o fechamento de caixa no dispositivo em que foram lançados."}
-            </p>
-          </article>
-          <article className="glass-panel legal-card">
-            <span>{locale === "en" ? "02 · STORAGE" : "02 · ARMAZENAMENTO"}</span>
-            <h3>{locale === "en" ? "Where data stays" : "Onde ficam os dados"}</h3>
-            <p>
-              {locale === "en" ? "In this version, operational data stays in the browser's local storage. Shift history remains available for up to three days unless the operator removes it sooner." : "Nesta versão, os dados operacionais ficam no armazenamento local do navegador. O histórico de turnos permanece disponível por até três dias, salvo quando o próprio operador o remove antes disso."}
-            </p>
-            <p>
-              {locale === "en" ? "PixBee does not send local financial history to a system-owned database. Clearing browser data or using another device may remove or separate these records." : "O PixBee não envia o histórico financeiro local para uma base de dados própria do sistema. Limpar os dados do navegador ou usar outro dispositivo pode remover ou separar esses registros."}
+              {localize(locale, "This data is used only to calculate, review, print, and export the cash closing on the device where it was entered.", "Estos datos se usan solo para calcular, revisar, imprimir y exportar el cierre de caja en el dispositivo donde se registraron.", "Esses dados são usados apenas para calcular, revisar, imprimir e exportar o fechamento de caixa no dispositivo em que foram lançados.")}
             </p>
           </article>
           <article className="glass-panel legal-card">
-            <span>{locale === "en" ? "03 · SECURITY" : "03 · SEGURANÇA"}</span>
-            <h3>{locale === "en" ? "Operator precautions" : "Cuidados do operador"}</h3>
+            <span>{localize(locale, "02 · STORAGE", "02 · ALMACENAMIENTO", "02 · ARMAZENAMENTO")}</span>
+            <h3>{localize(locale, "Where data stays", "Dónde permanecen los datos", "Onde ficam os dados")}</h3>
             <p>
-              {locale === "en" ? "On a shared computer, finish the shift, export or print the required report, and remove the history when you finish. Protect the device and browser profile with a password." : "Em computador compartilhado, finalize o turno, exporte ou imprima o relatório necessário e remova o histórico ao encerrar o uso. Proteja o dispositivo e o perfil do navegador com senha."}
+              {localize(locale, "In this version, operational data stays in the browser's local storage. Shift history remains available for up to three days unless the operator removes it sooner.", "En esta versión, los datos operativos permanecen en el almacenamiento local del navegador. El historial de turnos está disponible hasta tres días, salvo que la persona operadora lo elimine antes.", "Nesta versão, os dados operacionais ficam no armazenamento local do navegador. O histórico de turnos permanece disponível por até três dias, salvo quando o próprio operador o remove antes disso.")}
             </p>
             <p>
-              {locale === "en" ? "Local storage reduces data circulation, but it does not replace internal policies, access controls, or security procedures of the company using the system." : "O armazenamento local reduz a circulação dos dados, mas não substitui políticas internas, controles de acesso ou procedimentos de segurança da empresa usuária."}
-            </p>
-          </article>
-          <article className="glass-panel legal-card">
-            <span>{locale === "en" ? "04 · YOUR CONTROLS" : "04 · SEUS CONTROLES"}</span>
-            <h3>{locale === "en" ? "Access, correction, and deletion" : "Acesso, correção e exclusão"}</h3>
-            <p>
-              {locale === "en" ? "The operator can review local history, edit entries with a recorded reason, and remove device data through PixBee history or browser settings. Deleted entries remain recorded in the shift audit trail while the history exists." : "O operador pode revisar o histórico local, editar lançamentos com justificativa registrada e remover os dados do dispositivo pelo histórico do PixBee ou pelas configurações do navegador. A exclusão de lançamentos continua registrada na trilha de auditoria do turno enquanto o histórico existir."}
+              {localize(locale, "PixBee does not send local financial history to a system-owned database. Clearing browser data or using another device may remove or separate these records.", "PixBee no envía el historial financiero local a una base de datos propia del sistema. Borrar los datos del navegador o usar otro dispositivo puede eliminar o separar estos registros.", "O PixBee não envia o histórico financeiro local para uma base de dados própria do sistema. Limpar os dados do navegador ou usar outro dispositivo pode remover ou separar esses registros.")}
             </p>
           </article>
           <article className="glass-panel legal-card">
-            <span>{locale === "en" ? "05 · COPYRIGHT" : "05 · DIREITOS AUTORAIS"}</span>
+            <span>{localize(locale, "03 · SECURITY", "03 · SEGURIDAD", "03 · SEGURANÇA")}</span>
+            <h3>{localize(locale, "Operator precautions", "Precauciones de la persona operadora", "Cuidados do operador")}</h3>
+            <p>
+              {localize(locale, "On a shared computer, finish the shift, export or print the required report, and remove the history when you finish. Protect the device and browser profile with a password.", "En un equipo compartido, finaliza el turno, exporta o imprime el informe necesario y elimina el historial al terminar. Protege el dispositivo y el perfil del navegador con una contraseña.", "Em computador compartilhado, finalize o turno, exporte ou imprima o relatório necessário e remova o histórico ao encerrar o uso. Proteja o dispositivo e o perfil do navegador com senha.")}
+            </p>
+            <p>
+              {localize(locale, "Local storage reduces data circulation, but it does not replace internal policies, access controls, or security procedures of the company using the system.", "El almacenamiento local reduce la circulación de datos, pero no sustituye las políticas internas, los controles de acceso ni los procedimientos de seguridad de la empresa usuaria.", "O armazenamento local reduz a circulação dos dados, mas não substitui políticas internas, controles de acesso ou procedimentos de segurança da empresa usuária.")}
+            </p>
+          </article>
+          <article className="glass-panel legal-card">
+            <span>{localize(locale, "04 · YOUR CONTROLS", "04 · TUS CONTROLES", "04 · SEUS CONTROLES")}</span>
+            <h3>{localize(locale, "Access, correction, and deletion", "Acceso, corrección y eliminación", "Acesso, correção e exclusão")}</h3>
+            <p>
+              {localize(locale, "The operator can review local history, edit entries with a recorded reason, and remove device data through PixBee history or browser settings. Deleted entries remain recorded in the shift audit trail while the history exists.", "La persona operadora puede revisar el historial local, editar movimientos con un motivo registrado y eliminar los datos del dispositivo mediante el historial de PixBee o la configuración del navegador. Los movimientos eliminados permanecen registrados en la auditoría del turno mientras exista el historial.", "O operador pode revisar o histórico local, editar lançamentos com justificativa registrada e remover os dados do dispositivo pelo histórico do PixBee ou pelas configurações do navegador. A exclusão de lançamentos continua registrada na trilha de auditoria do turno enquanto o histórico existir.")}
+            </p>
+          </article>
+          <article className="glass-panel legal-card">
+            <span>{localize(locale, "05 · COPYRIGHT", "05 · DERECHOS DE AUTOR", "05 · DIREITOS AUTORAIS")}</span>
             <h3>PixBee FechaCaixa</h3>
             <p>
-              {locale === "en" ? "© 2026 Khaleesi Saithe. All rights to the original code, visual identity, text, interface structure, and PixBee materials are reserved, except where an express license states otherwise." : "© 2026 Khaleesi Saithe. Todos os direitos sobre o código original, identidade visual, textos, estrutura de interface e materiais do PixBee são reservados, exceto onde houver licença expressa em contrário."}
+              {localize(locale, "© 2026 Khaleesi Saithe. All rights to the original code, visual identity, text, interface structure, and PixBee materials are reserved, except where an express license states otherwise.", "© 2026 Khaleesi Saithe. Todos los derechos sobre el código original, la identidad visual, los textos, la estructura de interfaz y los materiales de PixBee están reservados, salvo que una licencia expresa indique lo contrario.", "© 2026 Khaleesi Saithe. Todos os direitos sobre o código original, identidade visual, textos, estrutura de interface e materiais do PixBee são reservados, exceto onde houver licença expressa em contrário.")}
             </p>
             <p>
-              {locale === "en" ? "Third-party libraries and assets used by the project remain subject to their respective licenses. Commercial reproduction, redistribution, or creation of a derivative product from the original code is not authorized without the rights holder's written permission." : "Bibliotecas e ativos de terceiros usados pelo projeto permanecem sujeitos às respectivas licenças. Não é autorizada a reprodução comercial, redistribuição ou criação de produto derivado do código original sem autorização escrita da titular."}
+              {localize(locale, "Third-party libraries and assets used by the project remain subject to their respective licenses. Commercial reproduction, redistribution, or creation of a derivative product from the original code is not authorized without the rights holder's written permission.", "Las bibliotecas y los recursos de terceros utilizados por el proyecto siguen sujetos a sus respectivas licencias. No se autoriza la reproducción comercial, redistribución ni creación de productos derivados del código original sin autorización escrita de la titular de los derechos.", "Bibliotecas e ativos de terceiros usados pelo projeto permanecem sujeitos às respectivas licenças. Não é autorizada a reprodução comercial, redistribuição ou criação de produto derivado do código original sem autorização escrita da titular.")}
             </p>
           </article>
           <article className="glass-panel legal-card legal-contact">
-            <span>{locale === "en" ? "06 · CONTACT AND UPDATES" : "06 · CONTATO E ATUALIZAÇÕES"}</span>
-            <h3>{locale === "en" ? "Questions or requests" : "Dúvidas ou pedidos"}</h3>
+            <span>{localize(locale, "06 · CONTACT AND UPDATES", "06 · CONTACTO Y ACTUALIZACIONES", "06 · CONTATO E ATUALIZAÇÕES")}</span>
+            <h3>{localize(locale, "Questions or requests", "Preguntas o solicitudes", "Dúvidas ou pedidos")}</h3>
             <p>
-              {locale === "en" ? "For questions about this policy, use of the project, or authorship rights, contact the creator through her professional profile. If PixBee starts using accounts, a database, payments, or an external register integration, this page must be reviewed before activation." : "Para dúvidas sobre esta política, uso do projeto ou direitos de autoria, entre em contato pelo perfil profissional da criadora. Quando o PixBee passar a usar cadastro, banco de dados, pagamentos ou integração com caixa externo, esta página deverá ser revisada antes da ativação."}
+              {localize(locale, "For questions about this policy, use of the project, or authorship rights, contact the creator through her professional profile. If PixBee starts using accounts, a database, payments, or an external register integration, this page must be reviewed before activation.", "Para preguntas sobre esta política, el uso del proyecto o los derechos de autoría, contacta a la creadora a través de su perfil profesional. Si PixBee comienza a usar cuentas, una base de datos, pagos o una integración externa de caja, esta página deberá revisarse antes de activarse.", "Para dúvidas sobre esta política, uso do projeto ou direitos de autoria, entre em contato pelo perfil profissional da criadora. Quando o PixBee passar a usar cadastro, banco de dados, pagamentos ou integração com caixa externo, esta página deverá ser revisada antes da ativação.")}
             </p>
             <a
               href="https://github.com/khaleesisaithe"
               target="_blank"
               rel="noreferrer"
             >
-              {locale === "en" ? "Contact Khaleesi Saithe" : "Falar com Khaleesi Saithe"} <ArrowRight size={16} />
+              {localize(locale, "Contact Khaleesi Saithe", "Contactar a Khaleesi Saithe", "Falar com Khaleesi Saithe")} <ArrowRight size={16} />
             </a>
           </article>
           <article className="glass-panel legal-card">
-            <span>{locale === "en" ? "07 · CUSTOMER FEEDBACK" : "07 · EXPERIÊNCIA DO CLIENTE"}</span>
-            <h3>{locale === "en" ? "Reports sent through the form" : "Relatos enviados pelo formulário"}</h3>
+            <span>{localize(locale, "07 · CUSTOMER FEEDBACK", "07 · EXPERIENCIA DEL CLIENTE", "07 · EXPERIÊNCIA DO CLIENTE")}</span>
+            <h3>{localize(locale, "Reports sent through the form", "Mensajes enviados mediante el formulario", "Relatos enviados pelo formulário")}</h3>
             <p>
-              {locale === "en" ? "Submission is optional. When someone fills out the experience form, PixBee forwards a contact email, profile, company, tax ID, report, and suggestion through the hosted service" : "O envio é opcional. Quando a pessoa preenche o formulário de experiência, o PixBee encaminha e-mail de contato, perfil, empresa, CNPJ, relato e sugestão pelo serviço hospedado"}
+              {localize(locale, "Submission is optional. When someone fills out the experience form, PixBee forwards a contact email, profile, company, tax ID, report, and suggestion through the hosted service", "El envío es opcional. Cuando una persona completa el formulario de experiencia, PixBee envía correo de contacto, perfil, empresa, identificación fiscal, relato y sugerencia mediante el servicio alojado", "O envio é opcional. Quando a pessoa preenche o formulário de experiência, o PixBee encaminha e-mail de contato, perfil, empresa, CNPJ, relato e sugestão pelo serviço hospedado")}
               {" "}
               <a
                 href="https://formspree.io/legal/privacy-policy/"
@@ -3860,27 +3907,27 @@ function LegalPage() {
                 Formspree
               </a>
               {" "}
-              {locale === "en" ? "so the creator can reply and evaluate improvements to the system." : "para a criadora responder e avaliar melhorias no sistema."}
+              {localize(locale, "so the creator can reply and evaluate improvements to the system.", "para que la creadora pueda responder y evaluar mejoras del sistema.", "para a criadora responder e avaliar melhorias no sistema.")}
             </p>
             <p>
-              {locale === "en" ? "This data is not mixed with the local financial history of the drawer. Do not send passwords, card details, Pix keys, or other payment information through the form; submissions are subject to the hosted service's privacy policy." : "Esses dados não se misturam ao histórico financeiro local do caixa. Não envie senhas, dados de cartão, chaves Pix ou outras informações de pagamento pelo formulário; o envio fica sujeito à política de privacidade do serviço hospedado."}
+              {localize(locale, "This data is not mixed with the local financial history of the drawer. Do not send passwords, card details, Pix keys, or other payment information through the form; submissions are subject to the hosted service's privacy policy.", "Estos datos no se mezclan con el historial financiero local de la caja. No envíes contraseñas, datos de tarjeta, claves PIX u otra información de pago mediante el formulario; los envíos están sujetos a la política de privacidad del servicio alojado.", "Esses dados não se misturam ao histórico financeiro local do caixa. Não envie senhas, dados de cartão, chaves Pix ou outras informações de pagamento pelo formulário; o envio fica sujeito à política de privacidade do serviço hospedado.")}
             </p>
           </article>
           <article className="glass-panel legal-card">
-            <span>{locale === "en" ? "08 · ADVERTISING" : "08 · PUBLICIDADE"}</span>
-            <h3>{locale === "en" ? "Optional advertising" : "Publicidade opcional"}</h3>
+            <span>{localize(locale, "08 · ADVERTISING", "08 · PUBLICIDAD", "08 · PUBLICIDADE")}</span>
+            <h3>{localize(locale, "Optional advertising", "Publicidad opcional", "Publicidade opcional")}</h3>
             <p>
-              {locale === "en" ? "Google AdSense is prepared as an optional monetization feature and remains disabled until the site is approved and the publisher configuration is completed. No advertising script is loaded in the cash opening, counting, validation, or history flows." : "O Google AdSense está preparado como recurso opcional de monetização e permanece desativado até a aprovação do site e a conclusão da configuração do editor. Nenhum script de publicidade é carregado nos fluxos de abertura, contagem, validação ou histórico do caixa."}
+              {localize(locale, "Google AdSense is prepared as an optional monetization feature and remains disabled until the site is approved and the publisher configuration is completed. No advertising script is loaded in the cash opening, counting, validation, or history flows.", "Google AdSense está preparado como un recurso de monetización opcional y permanece desactivado hasta que el sitio sea aprobado y se complete la configuración de la cuenta editora. No se carga ningún script publicitario en los flujos de apertura, conteo, validación o historial de caja.", "O Google AdSense está preparado como recurso opcional de monetização e permanece desativado até a aprovação do site e a conclusão da configuração do editor. Nenhum script de publicidade é carregado nos fluxos de abertura, contagem, validação ou histórico do caixa.")}
             </p>
             <p>
-              {locale === "en" ? "If advertising is enabled later, ads will be limited to public institutional areas and handled under Google's policies and the applicable privacy and consent requirements." : "Se a publicidade for ativada futuramente, os anúncios ficarão limitados às áreas públicas institucionais e serão tratados conforme as políticas do Google e os requisitos aplicáveis de privacidade e consentimento."}
+              {localize(locale, "If advertising is enabled later, ads will be limited to public institutional areas and handled under Google's policies and the applicable privacy and consent requirements.", "Si la publicidad se activa en el futuro, los anuncios se limitarán a áreas públicas institucionales y se gestionarán de acuerdo con las políticas de Google y los requisitos aplicables de privacidad y consentimiento.", "Se a publicidade for ativada futuramente, os anúncios ficarão limitados às áreas públicas institucionais e serão tratados conforme as políticas do Google e os requisitos aplicáveis de privacidade e consentimento.")}
             </p>
           </article>
         </div>
         <aside className="glass-panel legal-note">
-          <strong>{locale === "en" ? "Important" : "Importante"}</strong>
+          <strong>{localize(locale, "Important", "Importante", "Importante")}</strong>
           <p>
-            {locale === "en" ? "This content describes the current local version of PixBee and serves as a transparency baseline. For commercial use, remote data collection, or integration with third-party systems, review the documents with specialized legal guidance." : "Este conteúdo descreve a versão local atual do PixBee e é uma base de transparência. Para uso comercial, coleta remota de dados ou integração com sistemas de terceiros, revise os documentos com orientação jurídica especializada."}
+            {localize(locale, "This content describes the current local version of PixBee and serves as a transparency baseline. For commercial use, remote data collection, or integration with third-party systems, review the documents with specialized legal guidance.", "Este contenido describe la versión local actual de PixBee y sirve como base de transparencia. Para uso comercial, recopilación remota de datos o integración con sistemas de terceros, revisa los documentos con asesoramiento jurídico especializado.", "Este conteúdo descreve a versão local atual do PixBee e é uma base de transparência. Para uso comercial, coleta remota de dados ou integração com sistemas de terceiros, revise os documentos com orientação jurídica especializada.")}
           </p>
           <div>
             <a
@@ -3888,21 +3935,21 @@ function LegalPage() {
               target="_blank"
               rel="noreferrer"
             >
-              {locale === "en" ? "LGPD — Law No. 13,709/2018" : "LGPD — Lei nº 13.709/2018"}
+              {localize(locale, "LGPD — Law No. 13,709/2018", "LGPD — Ley n.º 13.709/2018", "LGPD — Lei nº 13.709/2018")}
             </a>
             <a
               href="https://www.planalto.gov.br/ccivil_03/leis/l9609.htm"
               target="_blank"
               rel="noreferrer"
             >
-              {locale === "en" ? "Software Law — Law No. 9,609/1998" : "Lei do Software — Lei nº 9.609/1998"}
+              {localize(locale, "Software Law — Law No. 9,609/1998", "Ley de Software — Ley n.º 9.609/1998", "Lei do Software — Lei nº 9.609/1998")}
             </a>
           </div>
         </aside>
         <AdSenseSlot
           slot={adsenseSettings.privacySlot}
           publicRoute="/privacidade"
-          label={locale === "en" ? "Advertisement" : "Publicidade"}
+          label={localize(locale, "Advertisement", "Publicidad", "Publicidade")}
         />
       </section>
     </AppShell>
@@ -3922,21 +3969,21 @@ function RetentionShell({ children }: { children: React.ReactNode }) {
         <AlertDialogContent className="history-dialog">
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {locale === "en" ? "Local history available for a report" : "Histórico local disponível para relatório"}
+              {locale === "en" ? "Local history available for a report" : locale === "es" ? "Historial local disponible para informe" : "Histórico local disponível para relatório"}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {locale === "en" ? "Some shifts are more than three days old in this browser. Generate the report before clearing the cache to preserve the records and audit trail." : "Há turnos com mais de três dias neste navegador. Gere o relatório antes da limpeza do cache para preservar os registros e a auditoria no canhoto."}
+              {localize(locale, "Some shifts are more than three days old in this browser. Generate the report before clearing the cache to preserve the records and audit trail.", "Algunos turnos tienen más de tres días en este navegador. Genera el informe antes de borrar la caché para preservar los registros y la auditoría.", "Há turnos com mais de três dias neste navegador. Gere o relatório antes da limpeza do cache para preservar os registros e a auditoria no canhoto.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{locale === "en" ? "Do this later" : "Fazer depois"}</AlertDialogCancel>
+            <AlertDialogCancel>{localize(locale, "Do this later", "Hacerlo después", "Fazer depois")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 setOpen(false);
                 navigate("/historico");
               }}
             >
-              <History size={16} /> {locale === "en" ? "Open report" : "Abrir relatório"}
+              <History size={16} /> {localize(locale, "Open report", "Abrir informe", "Abrir relatório")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

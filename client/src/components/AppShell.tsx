@@ -57,6 +57,11 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
   );
   const navClass = (active: boolean) =>
     `pixbee-nav-button ${active ? "active" : ""}`;
+  const localizedThemeCopy: Record<string, { label: string; description: string }> = {
+    emerald: { label: "Esmeralda", description: "Verde operativo con detalles turquesa." },
+    midnight: { label: "Índigo nocturno", description: "Azul profundo con violeta de alta intensidad." },
+    daylight: { label: "Brisa clara", description: "Fondo claro, azul marino y detalles coral." },
+  };
 
   function startNewCount() {
     if (session.closureRequired && !session.validatedAt) {
@@ -84,11 +89,11 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
 
   return (
     <div className="pixbee-page">
-      <aside className="pixbee-sidebar" aria-label={locale === "en" ? "PixBee navigation" : "Navegação do PixBee"}>
+      <aside className="pixbee-sidebar" aria-label={locale === "en" ? "PixBee navigation" : locale === "es" ? "Navegación de PixBee" : "Navegação do PixBee"}>
         <Link
           href="/"
           className="pixbee-logo"
-          aria-label={locale === "en" ? "PixBee home page" : "Página inicial do PixBee"}
+          aria-label={locale === "en" ? "PixBee home page" : locale === "es" ? "Página de inicio de PixBee" : "Página inicial do PixBee"}
         >
           <span className="pixbee-mark" aria-hidden="true">
             <i />
@@ -105,8 +110,8 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
           <Link
             href="/"
             className={navClass(location === "/")}
-            aria-label={locale === "en" ? "Home" : "Início"}
-            title={locale === "en" ? "Home" : "Início"}
+            aria-label={locale === "en" ? "Home" : locale === "es" ? "Inicio" : "Início"}
+            title={locale === "en" ? "Home" : locale === "es" ? "Inicio" : "Início"}
           >
             <HomeIcon size={22} />
             <span>{t("nav.home")}</span>
@@ -115,8 +120,8 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
             className={navClass(isCountRoute)}
             type="button"
             onClick={startNewCount}
-            aria-label={locale === "en" ? "New count" : "Nova contagem"}
-            title={locale === "en" ? "New count" : "Nova contagem"}
+            aria-label={locale === "en" ? "New count" : locale === "es" ? "Nuevo conteo" : "Nova contagem"}
+            title={locale === "en" ? "New count" : locale === "es" ? "Nuevo conteo" : "Nova contagem"}
           >
             <CircleDollarSign size={22} />
             <span>{t("nav.newCount")}</span>
@@ -125,8 +130,8 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
             className={navClass(location === "/historico")}
             type="button"
             onClick={() => navigate("/historico")}
-            aria-label={locale === "en" ? "History" : "Histórico"}
-            title={locale === "en" ? "History" : "Histórico"}
+            aria-label={locale === "en" ? "History" : locale === "es" ? "Historial" : "Histórico"}
+            title={locale === "en" ? "History" : locale === "es" ? "Historial" : "Histórico"}
           >
             <History size={22} />
             <span>{t("nav.history")}</span>
@@ -135,8 +140,8 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
             className={navClass(location === "/privacidade")}
             type="button"
             onClick={() => navigate("/privacidade")}
-            aria-label={locale === "en" ? "Privacy and rights" : "Privacidade e direitos"}
-            title={locale === "en" ? "Privacy and rights" : "Privacidade e direitos"}
+            aria-label={locale === "en" ? "Privacy and rights" : locale === "es" ? "Privacidad y derechos" : "Privacidade e direitos"}
+            title={locale === "en" ? "Privacy and rights" : locale === "es" ? "Privacidad y derechos" : "Privacidade e direitos"}
           >
             <Settings size={22} />
             <span>{t("nav.privacy")}</span>
@@ -147,8 +152,8 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
           className={`${navClass(location === "/sobre")} pixbee-menu-button`}
           type="button"
           onClick={() => navigate("/sobre")}
-          aria-label={locale === "en" ? "About PixBee" : "Sobre o PixBee"}
-          title={locale === "en" ? "About PixBee" : "Sobre o PixBee"}
+          aria-label={locale === "en" ? "About PixBee" : locale === "es" ? "Sobre PixBee" : "Sobre o PixBee"}
+          title={locale === "en" ? "About PixBee" : locale === "es" ? "Sobre PixBee" : "Sobre o PixBee"}
         >
           <Menu size={22} />
           <span>{t("nav.about")}</span>
@@ -161,7 +166,7 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
             <Link
               href="/"
               className="topbar-brand"
-              aria-label={locale === "en" ? "PixBee home page" : "Página inicial do PixBee"}
+              aria-label={locale === "en" ? "PixBee home page" : locale === "es" ? "Página de inicio de PixBee" : "Página inicial do PixBee"}
             >
               <span className="pixbee-mark" aria-hidden="true">
                 <i />
@@ -176,14 +181,14 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
               </span>
             </Link>
             <div className="topbar-title">
-              <p>{locale === "en" ? "Count with confidence" : "Conferir sem dúvida"}</p>
+              <p>{locale === "en" ? "Count with confidence" : locale === "es" ? "Cuenta con confianza" : "Conferir sem dúvida"}</p>
               <h1>{localizedTitle}</h1>
             </div>
           </div>
 
           <div
             className="topbar-steps"
-                          aria-label={locale === "en" ? `Step ${currentStep} of 4` : `Etapa ${currentStep} de 4`}
+                          aria-label={locale === "en" ? `Step ${currentStep} of 4` : locale === "es" ? `Etapa ${currentStep} de 4` : `Etapa ${currentStep} de 4`}
 
           >
             {[1, 2, 3, 4].map(step => (
@@ -245,8 +250,8 @@ export function AppShell({ children, title, currentStep }: AppShellProps) {
               >
                 <i className={`theme-swatch ${option.id}`} aria-hidden="true" />
                 <span>
-                  <strong>{option.label}</strong>
-                  <small>{option.description}</small>
+                  <strong>{locale === "es" ? localizedThemeCopy[option.id].label : option.label}</strong>
+                  <small>{locale === "es" ? localizedThemeCopy[option.id].description : option.description}</small>
                 </span>
               </button>
             ))}
