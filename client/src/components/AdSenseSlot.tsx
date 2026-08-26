@@ -9,6 +9,8 @@ type AdSenseSlotProps = {
   slot: string;
   publicRoute: PublicAdRoute;
   label?: string;
+  variant?: "standard" | "thin" | "compact";
+  format?: "auto" | "horizontal";
   settings?: typeof adsenseSettings;
 };
 
@@ -16,6 +18,8 @@ export function AdSenseSlot({
   slot,
   publicRoute,
   label = "Publicidade",
+  variant = "standard",
+  format = "auto",
   settings = adsenseSettings,
 }: AdSenseSlotProps) {
   const adRef = useRef<HTMLModElement>(null);
@@ -68,7 +72,7 @@ export function AdSenseSlot({
   if (!ready) return null;
 
   return (
-    <aside className="adsense-slot" aria-label={label}>
+    <aside className={`adsense-slot adsense-slot--${variant}`} aria-label={label}>
       <span className="adsense-slot-label">{label}</span>
       <ins
         ref={adRef}
@@ -76,7 +80,7 @@ export function AdSenseSlot({
         style={{ display: "block" }}
         data-ad-client={settings.clientId}
         data-ad-slot={slot}
-        data-ad-format="auto"
+        data-ad-format={format}
         data-full-width-responsive="true"
       />
     </aside>

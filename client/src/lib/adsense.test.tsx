@@ -60,7 +60,7 @@ describe("AdSense configuration", () => {
     expect(isPublicAdRoute("/abertura")).toBe(false);
     expect(isPublicAdRoute("/contagem")).toBe(false);
     expect(isPublicAdRoute("/validacao")).toBe(false);
-    expect(isPublicAdRoute("/historico")).toBe(false);
+    expect(isPublicAdRoute("/historico")).toBe(true);
   });
 
   it("keeps a public slot hidden when opt-in is false even with a valid publisher", () => {
@@ -118,14 +118,16 @@ describe("AdSense configuration", () => {
 
     const { container } = render(
       <AdSenseSlot
-        publicRoute="/"
+        publicRoute="/historico"
         slot={configuredSettings.homeSlot}
         label="Publicidade"
+        variant="compact"
         settings={configuredSettings}
       />,
     );
 
     expect(container.querySelector(".adsense-slot")).not.toBeNull();
+    expect(container.querySelector(".adsense-slot--compact")).not.toBeNull();
     expect(container.querySelector("ins.adsbygoogle")?.getAttribute("data-ad-client")).toBe(configuredSettings.clientId);
     expect(container.querySelector("ins.adsbygoogle")?.getAttribute("data-ad-slot")).toBe(configuredSettings.homeSlot);
     expect(document.getElementById("pixbee-adsense-script")?.getAttribute("src")).toContain(configuredSettings.clientId);

@@ -2,7 +2,7 @@ import { isValidAdSenseClientId } from "@shared/adsense";
 
 export { isValidAdSenseClientId } from "@shared/adsense";
 
-export const PUBLIC_AD_ROUTES = ["/", "/sobre", "/privacidade"] as const;
+export const PUBLIC_AD_ROUTES = ["/", "/sobre", "/privacidade", "/historico"] as const;
 export type PublicAdRoute = (typeof PUBLIC_AD_ROUTES)[number];
 
 export function isPublicAdRoute(route: string): route is PublicAdRoute {

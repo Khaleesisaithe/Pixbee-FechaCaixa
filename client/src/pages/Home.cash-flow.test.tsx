@@ -11,7 +11,7 @@ import {
 } from "../contexts/CashSessionContext";
 import { LanguageProvider } from "../contexts/LanguageContext";
 import { ThemeProvider } from "../contexts/ThemeContext";
-import { CashEntryWorkspace, DenominationRow, OpeningFloatDialog, OpeningPage } from "./Home";
+import { AdjustmentWorkspace, CashEntryWorkspace, DenominationRow, OpeningFloatDialog, OpeningPage } from "./Home";
 
 afterEach(() => {
   cleanup();
@@ -223,5 +223,79 @@ describe("interface de abertura e entradas em espécie", () => {
     expect(screen.getByRole("button", { name: "Aumentar R$ 10" }).hasAttribute("disabled")).toBe(true);
     expect((screen.getByRole("spinbutton", { name: "Quantidade protegida de R$ 10" }) as HTMLInputElement).readOnly).toBe(true);
     expect(screen.getByText("Fundo confirmado: 2")).toBeTruthy();
+  });
+
+  it("permite sangria acima da última entrada quando o caixa físico tem R$ 190 disponíveis", async () => {
+    const user = userEvent.setup();
+    const openingQuantities = { ...createEmptyQuantities(), n20: 1 };
+    const quantities = { ...openingQuantities, n100: 1, n50: 1, n20: 2 };
+    window.localStorage.setItem(
+      "pixbee-fecha-caixa-session-v2",
+      JSON.stringify({
+        ...createNewSession(),
+        openingQuantities,
+        quantities,
+        openingFloat: 20,
+      })
+    );
+
+    render(
+      <LanguageProvider>
+        <CashSessionProvider>
+          <AdjustmentWorkspace type="withdrawal" />
+          <SessionProbe />
+        </CashSessionProvider>
+      </LanguageProvider>
+    );
+
+    await user.type(screen.getByRole("spinbutton"), "100");
+    await user.click(screen.getByRole("button", { name: "Registrar" }));
+    await user.click(screen.getByRole("button", { name: "Aumentar R$ 100" }));
+    await user.click(screen.getByRole("button", { name: /Confirmar composição/i }));
+
+    await waitFor(() => {
+      const updatedQuantities = JSON.parse(
+        screen.getByTestId("physical-quantities").textContent ?? "{}"
+      );
+      expect(updatedQuantities.n100).toBe(0);
+      expect(updatedQuantities.n50).toBe(1);
+      expect(updatedQuantities.n20).toBe(2);
+    });
+  });
+
+  it("recusa uma sangria cuja composição excede as unidades fisicamente disponíveis", async () => {
+    const user = userEvent.setup();
+    const quantities = { ...createEmptyQuantities(), n100: 1 };
+    window.localStorage.setItem(
+      "pixbee-fecha-caixa-session-v2",
+      JSON.stringify({
+        ...createNewSession(),
+        openingQuantities: createEmptyQuantities(),
+        quantities,
+        openingFloat: 0,
+      })
+    );
+
+    render(
+      <LanguageProvider>
+        <CashSessionProvider>
+          <AdjustmentWorkspace type="withdrawal" />
+          <SessionProbe />
+        </CashSessionProvider>
+      </LanguageProvider>
+    );
+
+    await user.type(screen.getByRole("spinbutton"), "200");
+    await user.click(screen.getByRole("button", { name: "Registrar" }));
+    await user.click(screen.getByRole("button", { name: "Aumentar R$ 100" }));
+    await user.click(screen.getByRole("button", { name: "Aumentar R$ 100" }));
+    await user.click(screen.getByRole("button", { name: /Confirmar composição/i }));
+
+    const unchangedQuantities = JSON.parse(
+      screen.getByTestId("physical-quantities").textContent ?? "{}"
+    );
+    expect(unchangedQuantities.n100).toBe(1);
+    expect(screen.getByRole("dialog")).toBeTruthy();
+    expect(screen.getByText("Nenhum lançamento neste turno.")).toBeTruthy();
   });
 });

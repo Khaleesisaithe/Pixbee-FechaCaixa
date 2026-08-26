@@ -38,14 +38,22 @@ afterEach(() => {
 });
 
 describe("AdSense route integration", () => {
-  it("keeps the real operational routes free from slots and scripts", async () => {
-    for (const route of ["/abertura", "/contagem", "/validacao", "/historico"]) {
+  it("keeps the critical cash-operation routes free from slots and scripts", async () => {
+    for (const route of ["/abertura", "/contagem", "/validacao"]) {
       const { unmount } = await renderAppAt(route, validSettings);
 
       expect(document.querySelector(".adsense-slot")).toBeNull();
       expect(document.getElementById("pixbee-adsense-script")).toBeNull();
       unmount();
     }
+  });
+
+  it("renders the intentionally compact public slot in History when configured", async () => {
+    const { unmount } = await renderAppAt("/historico", validSettings);
+
+    expect(document.querySelector(".adsense-slot.adsense-slot--compact")).not.toBeNull();
+    expect(document.getElementById("pixbee-adsense-script")).not.toBeNull();
+    unmount();
   });
 
   it("keeps a real public route hidden when opt-in is false with a valid publisher", async () => {

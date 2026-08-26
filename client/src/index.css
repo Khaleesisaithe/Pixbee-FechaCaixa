@@ -3229,6 +3229,12 @@ html.pixbee-high-contrast
   gap: 20px;
   min-height: calc(100vh - 135px);
 }
+.history-top-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(210px, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
 .history-heading {
   display: flex;
   justify-content: space-between;
@@ -4339,6 +4345,65 @@ html[data-pixbee-theme="daylight"] .adjustment-list article {
   border-color: rgb(20 48 71 / 0.14);
   background: rgb(226 239 245 / 0.62);
 }
+html[data-pixbee-theme="daylight"] .adjustment-workspace,
+html[data-pixbee-theme="daylight"] .adjustment-list > article:not(.adjustment-workspace) {
+  border-color: rgb(20 48 71 / 0.2);
+  background: #e5f1f6;
+}
+html[data-pixbee-theme="daylight"] .adjustment-workspace > header {
+  border-bottom-color: rgb(20 48 71 / 0.18);
+  background: #d8edf4;
+}
+html[data-pixbee-theme="daylight"] .adjustment-workspace > header > div strong,
+html[data-pixbee-theme="daylight"] .adjustment-history > div:first-child > span,
+html[data-pixbee-theme="daylight"] .adjustment-entry span strong {
+  color: #143047 !important;
+}
+html[data-pixbee-theme="daylight"] .adjustment-workspace > header > div small,
+html[data-pixbee-theme="daylight"] .adjustment-note-input > span,
+html[data-pixbee-theme="daylight"] .adjustment-note-input small,
+html[data-pixbee-theme="daylight"] .digital-meta small,
+html[data-pixbee-theme="daylight"] .adjustment-list article small,
+html[data-pixbee-theme="daylight"] .adjustment-entry time,
+html[data-pixbee-theme="daylight"] .adjustment-entry span small,
+html[data-pixbee-theme="daylight"] .adjustment-history > div:first-child > small {
+  color: #39576a !important;
+}
+html[data-pixbee-theme="daylight"] .adjustment-workspace > header > b {
+  color: #0d6480;
+}
+html[data-pixbee-theme="daylight"] .cash-entry-workspace .adjustment-entry > b,
+html[data-pixbee-theme="daylight"] .adjustment-entry .positive,
+html[data-pixbee-theme="daylight"] .adjustment-list .positive {
+  color: #0a713d !important;
+  font-weight: 800;
+}
+html[data-pixbee-theme="daylight"] .adjustment-workspace input {
+  color: #143047;
+  border-color: rgb(20 48 71 / 0.22);
+  background: #ffffff;
+}
+html[data-pixbee-theme="daylight"] .adjustment-workspace input::placeholder {
+  color: #627988;
+}
+html[data-pixbee-theme="daylight"] .adjustment-workspace .amount-input > div {
+  border-color: rgb(20 48 71 / 0.22);
+  background: #ffffff;
+}
+html[data-pixbee-theme="daylight"] .adjustment-entry {
+  border-top-color: rgb(20 48 71 / 0.16);
+}
+html[data-pixbee-theme="daylight"] .adjustment-add-button {
+  color: #ffffff !important;
+  border-color: #08713f !important;
+  background: #08713f !important;
+  box-shadow: 0 5px 14px rgb(8 113 63 / 0.18);
+}
+html[data-pixbee-theme="daylight"] .adjustment-add-button:hover {
+  color: #ffffff !important;
+  border-color: #065b33 !important;
+  background: #065b33 !important;
+}
 html[data-pixbee-theme="daylight"] .denomination-heading {
   border-bottom-color: rgb(20 48 71 / 0.14);
   background: rgb(215 232 240 / 0.75);
@@ -4862,6 +4927,24 @@ html[data-pixbee-theme="daylight"] .legal-updated {
   background: rgb(255 255 255 / 0.08);
   text-align: center;
 }
+.adsense-slot--thin {
+  min-height: 64px;
+  gap: 4px;
+  padding: 9px 14px;
+}
+.adsense-slot--thin ins {
+  min-height: 34px;
+}
+.adsense-slot--compact {
+  grid-column: auto;
+  min-height: 112px;
+  align-content: start;
+  gap: 6px;
+  padding: 11px 12px;
+}
+.adsense-slot--compact ins {
+  min-height: 68px;
+}
 .adsense-slot-label {
   color: var(--muted-foreground);
   font-size: 0.62rem;
@@ -4880,6 +4963,12 @@ html[data-pixbee-theme="daylight"] .adsense-slot-label {
   color: rgb(20 48 71 / 0.62);
 }
 @media (max-width: 700px) {
+  .history-top-grid {
+    grid-template-columns: 1fr;
+  }
+  .adsense-slot--compact {
+    min-height: 78px;
+  }
   .adsense-slot {
     min-height: 78px;
     padding: 12px 14px;

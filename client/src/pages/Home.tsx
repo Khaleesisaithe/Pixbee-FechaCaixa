@@ -804,6 +804,8 @@ function WelcomePage() {
           slot={adsenseSettings.homeSlot}
           publicRoute="/"
           label={locale === "en" ? "Advertisement" : "Publicidade"}
+          variant="thin"
+          format="horizontal"
         />
       </section>
     </AppShell>
@@ -1579,7 +1581,7 @@ export function ThermalReceipt({
   );
 }
 
-function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
+export function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
   const { session, setSession } = useCashSession();
   const { locale } = useLanguage();
   const [amount, setAmount] = useState("");
@@ -1631,13 +1633,11 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
     if (
       type === "withdrawal" &&
       Object.entries(movementQuantities).some(
-        ([key, value]) =>
-          (session.quantities[key] ?? 0) - value <
-          (session.openingQuantities[key] ?? 0)
+        ([key, value]) => value > (session.quantities[key] ?? 0)
       )
     ) {
       toast.error(
-        locale === "en" ? "A withdrawal cannot remove units belonging to the opening float." : locale === "es" ? "Un retiro no puede quitar unidades pertenecientes al fondo inicial." : "A sangria não pode retirar unidades pertencentes ao fundo de abertura."
+        locale === "en" ? "A withdrawal cannot use more notes or coins than are physically available in the drawer." : locale === "es" ? "Un retiro no puede usar más billetes o monedas de los que están físicamente disponibles en la caja." : "A sangria não pode usar mais cédulas ou moedas do que as disponíveis fisicamente no caixa."
       );
       return;
     }
@@ -1670,7 +1670,7 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
       quantities:
         type === "supply"
           ? applyPhysicalMovement(current.quantities, movementQuantities)
-          : applyPhysicalMovement(current.quantities, createEmptyQuantities(), movementQuantities, current.openingQuantities),
+          : applyPhysicalMovement(current.quantities, createEmptyQuantities(), movementQuantities),
     }));
     setAmount("");
     setNote("");
@@ -1844,7 +1844,7 @@ function AdjustmentWorkspace({ type }: { type: AdjustmentKind }) {
             <DialogDescription>
               {localize(locale, "The composition must total exactly ", "La composición debe sumar exactamente ", "A composição deve somar exatamente ")}{formatCurrency(Number(amount) || 0)}.
               {type === "withdrawal"
-                ? localize(locale, " Units from the opening float remain protected.", " Las unidades del fondo inicial permanecen protegidas.", " As unidades do fundo de abertura permanecem protegidas.")
+                ? localize(locale, " The selected notes and coins will be removed from the current physical cash. You can withdraw any amount physically available in the drawer.", " Los billetes y monedas seleccionados se retirarán del efectivo físico actual. Puedes retirar cualquier importe físicamente disponible en la caja.", " As cédulas e moedas selecionadas serão removidas do caixa físico atual. Você pode fazer sangria de qualquer valor disponível fisicamente no caixa.")
                 : localize(locale, " These units will be added to the drawer's physical count.", " Estas unidades se añadirán al conteo físico de la caja.", " Essas unidades serão acrescentadas à contagem física do caixa.")}
             </DialogDescription>
           </DialogHeader>
@@ -3303,7 +3303,8 @@ export function HistoryPage() {
     <>
       <AppShell title={locale === "en" ? "Shift history" : locale === "es" ? "Historial de turnos" : "Histórico de turnos"} currentStep={3}>
         <section className="history-page">
-          <div className="glass-panel history-heading">
+          <div className="history-top-grid">
+            <div className="glass-panel history-heading">
             <div>
               <span>{localize(locale, "Entry lookup", "Consulta de movimientos", "Consulta de lançamentos")}</span>
               <h2>
@@ -3359,6 +3360,13 @@ export function HistoryPage() {
                 </Button>
               </div>
             </div>
+            </div>
+            <AdSenseSlot
+              slot={adsenseSettings.privacySlot}
+              publicRoute="/historico"
+              label={localize(locale, "Advertisement", "Publicidad", "Publicidade")}
+              variant="compact"
+            />
           </div>
           {filteredRecords.length === 0 ? (
             <div className="glass-panel history-empty">
@@ -3950,6 +3958,8 @@ function LegalPage() {
           slot={adsenseSettings.privacySlot}
           publicRoute="/privacidade"
           label={localize(locale, "Advertisement", "Publicidad", "Publicidade")}
+          variant="thin"
+          format="horizontal"
         />
       </section>
     </AppShell>

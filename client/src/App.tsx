@@ -1,5 +1,6 @@
 /** Design: PixBee original — rotas diretas entre início, abertura, contagem e validação. */
 import React from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CashSessionProvider } from "@/contexts/CashSessionContext";
@@ -46,6 +47,7 @@ function App() {
             <TooltipProvider>
               <Toaster position="top-center" richColors />
               <Router />
+              <Analytics />
               {isBooting || isLoaderPreview ? (
                 <div className="pixbee-app-loader" aria-label="Carregando PixBee">
                   <LoadingIndicator label="Preparando seu fechamento" />
